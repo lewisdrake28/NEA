@@ -1,0 +1,17 @@
+/Users/lewisdrake/Spell checker/Test file/bin/Debug/net5.0/Test file.deps.json
+/Users/lewisdrake/Spell checker/Test file/bin/Debug/net5.0/Test file.runtimeconfig.json
+/Users/lewisdrake/Spell checker/Test file/bin/Debug/net5.0/Test file.runtimeconfig.dev.json
+/Users/lewisdrake/Spell checker/Test file/bin/Debug/net5.0/Test file.dll
+/Users/lewisdrake/Spell checker/Test file/bin/Debug/net5.0/ref/Test file.dll
+/Users/lewisdrake/Spell checker/Test file/bin/Debug/net5.0/Test file.pdb
+/Users/lewisdrake/Spell checker/Test file/obj/Debug/net5.0/Test file.csproj.AssemblyReference.cache
+/Users/lewisdrake/Spell checker/Test file/obj/Debug/net5.0/Test file.GeneratedMSBuildEditorConfig.editorconfig
+/Users/lewisdrake/Spell checker/Test file/obj/Debug/net5.0/Test file.AssemblyInfoInputs.cache
+/Users/lewisdrake/Spell checker/Test file/obj/Debug/net5.0/Test file.AssemblyInfo.cs
+/Users/lewisdrake/Spell checker/Test file/obj/Debug/net5.0/Test file.csproj.CoreCompileInputs.cache
+/Users/lewisdrake/Spell checker/Test file/obj/Debug/net5.0/Test file.dll
+/Users/lewisdrake/Spell checker/Test file/obj/Debug/net5.0/ref/Test file.dll
+/Users/lewisdrake/Spell checker/Test file/obj/Debug/net5.0/Test file.pdb
+/Users/lewisdrake/Spell checker/Test file/obj/Debug/net5.0/Test file.genruntimeconfig.cache
+/Users/lewisdrake/Spell checker/Test file/bin/Debug/net5.0/Newtonsoft.Json.dll
+/Users/lewisdrake/Spell checker/Test file/obj/Debug/net5.0/Test file.csproj.CopyComplete
