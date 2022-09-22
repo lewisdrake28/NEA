@@ -1,0 +1,16 @@
+/Users/lewisdrake/NEA/Code/bin/Debug/net5.0/Code
+/Users/lewisdrake/NEA/Code/bin/Debug/net5.0/Code.deps.json
+/Users/lewisdrake/NEA/Code/bin/Debug/net5.0/Code.runtimeconfig.json
+/Users/lewisdrake/NEA/Code/bin/Debug/net5.0/Code.runtimeconfig.dev.json
+/Users/lewisdrake/NEA/Code/bin/Debug/net5.0/Code.dll
+/Users/lewisdrake/NEA/Code/bin/Debug/net5.0/Code.pdb
+/Users/lewisdrake/NEA/Code/obj/Debug/net5.0/Code.csproj.AssemblyReference.cache
+/Users/lewisdrake/NEA/Code/obj/Debug/net5.0/Code.GeneratedMSBuildEditorConfig.editorconfig
+/Users/lewisdrake/NEA/Code/obj/Debug/net5.0/Code.AssemblyInfoInputs.cache
+/Users/lewisdrake/NEA/Code/obj/Debug/net5.0/Code.AssemblyInfo.cs
+/Users/lewisdrake/NEA/Code/obj/Debug/net5.0/Code.csproj.CoreCompileInputs.cache
+/Users/lewisdrake/NEA/Code/obj/Debug/net5.0/Code.dll
+/Users/lewisdrake/NEA/Code/obj/Debug/net5.0/refint/Code.dll
+/Users/lewisdrake/NEA/Code/obj/Debug/net5.0/Code.pdb
+/Users/lewisdrake/NEA/Code/obj/Debug/net5.0/Code.genruntimeconfig.cache
+/Users/lewisdrake/NEA/Code/obj/Debug/net5.0/ref/Code.dll
