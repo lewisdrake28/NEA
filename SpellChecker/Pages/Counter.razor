@@ -1,18 +1,58 @@
 ﻿@page "/counter"
+@using SpellChecker.Data
+@inject LevenshteinDistance leven
 
-<PageTitle>Counter</PageTitle>
+<PageTitle>Levenshtein</PageTitle>
 
-<h1>Counter</h1>
+<h1>Levenshtein distance test</h1>
 
-<p role="status">Current count: @currentCount</p>
+<p role="status">@distance</p>
 
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+@* @code {
+    private int? distance;
+
+    protected override async Task OnInitializedAsync()
+    {
+        distance = await leven.Calculate("abc", "acg");
+    }
+} *@
+
+<EditForm Model="@leven" OnInvalidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary/>
+
+    <InputText id="a" @bind-Value="leven.a"/>
+
+    <button type="submit">submit</button>
+</EditForm>
+
+
+<EditForm Model="@leven">
+@* <EditForm Model="@leven" OnInvalidSubmit="@HandleValidSubmit"> *@
+    <DataAnnotationsValidator />
+    <ValidationSummary/>
+
+    <InputText id="b" @bind-Value="leven.b"/>
+
+    @* <button type="submit">submit</button> *@
+</EditForm>
+
+<button type="submit">submit</button>
+<Button OnClick="@MyClickHandler">Click me!</Button>
+
 
 @code {
-    private int currentCount = 0;
 
-    private void IncrementCount()
+    private int? distance;
+    private async void HandleValidSubmit()
     {
-        currentCount++;
+
+
+        distance = await leven.Calculate();
+    }
+
+    private void MyClickHandler()
+    {
+        distance = leven.Calculate(a, b);
     }
 }
