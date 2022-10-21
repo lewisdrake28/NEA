@@ -94,15 +94,15 @@ namespace Code
 
             return finals;
         }
+    }
 
-        static void Main(string[] args)
+    static void Main(string[] args)
+    {
+        string word = Console.ReadLine();
+        List<string> definitions = DefineWord(word);
+        foreach (var definition in definitions)
         {
-            string word = Console.ReadLine();
-            List<string> definitions = DefineWord(word);
-            foreach (var definition in definitions)
-            {
-                Console.WriteLine(definition);
-            }
+            Console.WriteLine(definition);
         }
     }
 }
