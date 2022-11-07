@@ -1,8 +1,10 @@
 # NEA
 Spell checker NEA 
 
-Bloom Filter class - complete
+Bloom Filter - complete (needs commenting)
 
-BK-tree - incomplete 
+Levenshtein distance - complete (needs commenting)
 
-UI - incomplete
+BK-tree - complete 
+
+UI - incomplete(!!) (needs commenting)
