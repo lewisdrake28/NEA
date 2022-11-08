@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Collections;
 
-class Graph
+class BkTree
 {
     protected struct Connection
     {
@@ -22,7 +22,7 @@ class Graph
     protected static int[] weights = new int[words.Length];
     protected string root;
 
-    public Graph(string root)
+    public BkTree(string root)
     {
         weights = leven.CalculateAll(root, words);
 

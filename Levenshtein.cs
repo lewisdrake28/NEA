@@ -1,14 +1,14 @@
-// // install dependencies
-// using System;
-// using System.Linq;
+// install dependencies
+using System;
+using System.Linq;
 
 class LevenshteinDistance
 {
-    // int distance;
+    protected int distance;
 
     public LevenshteinDistance()
     {
-        // distance = 0;
+        distance = 0;
     }
 
     public int Calculate(string a, string b)
@@ -56,7 +56,7 @@ class LevenshteinDistance
             }
         }
 
-        int distance = matrix[a.Length, b.Length];
+        distance = matrix[a.Length, b.Length];
         return distance;
     }
 }

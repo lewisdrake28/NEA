@@ -1,16 +1,14 @@
 // install dependencies
-// using System;
-// using System.IO;
-// using System.Text;
-// using System.Linq;
+using System;
+using System.IO;
+using System.Text;
+using System.Linq;
 
 class BloomFilter
 {
-    // setup
     protected int[] filter = new int[2682974];
 
     // used to read the filter from the file and store as an array
-    // general use
     public BloomFilter()
     {
         // change filename to the filter.txt 
@@ -73,21 +71,8 @@ class BloomFilter
         filter[Hash10(word)] = 1;
     }
 
-    public int ViewFilter(int index)
-    {
-        return filter[index];
-    }
-
-    public void WriteFilter()
-    {
-        string filename = "/Users/lewisdrake/Desktop/Bloom Filter/Resources/Filter.txt";
-        string[] stringArray = filter.Select(x => x.ToString()).ToArray();
-        string result = String.Concat(stringArray);
-
-        File.WriteAllText(filename, result);
-    }
-
-    // hashing 
+    // used to make sure value is smaller than length of the filter 
+    // so the index will always work
     protected uint CheckSize(uint hash)
     {
         bool loop = true;
@@ -325,5 +310,28 @@ class BloomFilter
 
         hash = (uint)a;
         return (uint)hash;
+    }
+
+    // FIRST TIME USE
+    public void SetUp()
+    {
+        string[] words = File.ReadAllLines("/Users/lewisdrake/Desktop/WordLists/V2/TrueWords.txt");
+
+        foreach (var a in words)
+        {
+            Insert(a);
+        }
+
+        WriteFilter();
+    }
+
+    // write the filter to a text file
+    protected void WriteFilter()
+    {
+        string filename = "/Users/lewisdrake/Desktop/Bloom Filter/Resources/Filter.txt";
+        string[] stringArray = filter.Select(x => x.ToString()).ToArray();
+        string result = String.Concat(stringArray);
+
+        File.WriteAllText(filename, result);
     }
 }
