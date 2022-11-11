@@ -1,4 +1,5 @@
-﻿using FINAL;
+﻿// install dependencies
+using FINAL;
 using Terminal.Gui;
 using BKTree;
 using BloomFilter;
@@ -9,7 +10,7 @@ Application.Init();
 
 try
 {
-    Application.Run(new MyView());
+    Application.Run(new ExampleWindow());
 }
 finally
 {

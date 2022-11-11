@@ -1,11 +1,6 @@
 // install dependencies
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Collections;
 using Levenshtein;
-using System.Diagnostics.CodeAnalysis;
 
 // suppress warnings
 #pragma warning disable 

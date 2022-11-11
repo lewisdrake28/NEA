@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "yar+6CAbkpfMaIbR83i8r52FzKEIGcrrZvEgd+waKEYVgoXRrvpvYDmWrJS4j6/fXF2l3McuZ6nsN/SXrE17ug==",
+  "success": true,
+  "projectFilePath": "/Users/lewisdrake/NEA/TestProj/TestProj.csproj",
+  "expectedPackageFiles": [
+    "/Users/lewisdrake/.nuget/packages/nstack.core/1.0.3/nstack.core.1.0.3.nupkg.sha512",
+    "/Users/lewisdrake/.nuget/packages/system.valuetuple/4.5.0/system.valuetuple.4.5.0.nupkg.sha512",
+    "/Users/lewisdrake/.nuget/packages/terminal.gui/1.8.2/terminal.gui.1.8.2.nupkg.sha512"
+  ],
+  "logs": []
+}

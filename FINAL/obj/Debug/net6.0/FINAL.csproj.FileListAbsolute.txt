@@ -19,3 +19,4 @@
 /Users/lewisdrake/NEA/FINAL/obj/Debug/net6.0/FINAL.pdb
 /Users/lewisdrake/NEA/FINAL/obj/Debug/net6.0/FINAL.genruntimeconfig.cache
 /Users/lewisdrake/NEA/FINAL/obj/Debug/net6.0/ref/FINAL.dll
+/Users/lewisdrake/NEA/FINAL/bin/Debug/net6.0/Newtonsoft.Json.dll
