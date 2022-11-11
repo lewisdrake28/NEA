@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 
 namespace Code
 {
+    // create template to store JSON data retruned by API call
     class Word
     {
         public string word { get; set; }
@@ -61,6 +62,7 @@ namespace Code
             Word[] aword = new List<Word>(iword).ToArray();
             Word word = aword[0];
 
+            // makes sure there is only one definition for each word type
             Dictionary<string, string> definitions = new Dictionary<string, string>()
             {
                 {"noun", "null"},
@@ -73,7 +75,7 @@ namespace Code
                 {"interjection", "null"},
             };
 
-
+            // if the definition stored for the word type is null, then store the definiton
             for (int a = 0; a < word.meanings.Count; a++)
             {
                 if (definitions[word.meanings[a].partOfSpeech] == "null")
@@ -82,6 +84,7 @@ namespace Code
                 }
             }
 
+            // convert values in dictionary to list
             List<string> finals = new List<string>();
             foreach (KeyValuePair<string, string> kvPair in definitions)
             {

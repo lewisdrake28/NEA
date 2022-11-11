@@ -1,7 +1,7 @@
 # NEA
 Spell checker NEA 
 
-Bloom Filter - complete (needs commenting)
+Bloom Filter - complete 
 
 Levenshtein distance - complete
 

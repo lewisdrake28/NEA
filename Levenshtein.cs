@@ -15,6 +15,7 @@ class LevenshteinDistance
     {
         int cost;
 
+        // if a or b has no length, return the other one
         if (a.Length == 0)
         {
             return b.Length;
@@ -24,8 +25,14 @@ class LevenshteinDistance
             return a.Length;
         }
 
+        // row and column sizes are (word.Length + 1) because row/column 1 store index values
         int[,] matrix = new int[a.Length + 1, b.Length + 1];
 
+        // store index values in row/coilumn 1, example
+        // 0 1 ...
+        // 1
+        // 2
+        // ...
         for (int c = 0; c < matrix.GetLength(0); c++)
         {
             matrix[c, 0] = c;
@@ -39,10 +46,12 @@ class LevenshteinDistance
         {
             for (int d = 1; d < matrix.GetLength(1); d++)
             {
+                // if the values at the index are the same then no change is needed
                 if (a[c - 1] == b[d - 1])
                 {
                     cost = 0;
                 }
+                // if not then a change (substitution, deletion or addition) is needed
                 else
                 {
                     cost = 1;
@@ -56,6 +65,7 @@ class LevenshteinDistance
             }
         }
 
+        // final cost is stored in the bottom right of the matrix
         distance = matrix[a.Length, b.Length];
         return distance;
     }
