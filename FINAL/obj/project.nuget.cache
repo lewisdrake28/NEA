@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "hHcht+zK+G5oqG996MWm9Oi2tUUwda177GQCQ7Y8UGlX1G7Az/EYeUHN6qjyEVJMuzEdUNpUF+yqU9fLrdjscQ==",
+  "dgSpecHash": "3B8YYG+cGRfvg5+Feglloa3jLZACH6k5keRkBXSTEgZy2v9K7LPLMGNnqIuz+wBfpJEY4EoiaJl4TEMuU+HtUA==",
   "success": true,
   "projectFilePath": "/Users/lewisdrake/NEA/FINAL/FINAL.csproj",
   "expectedPackageFiles": [
+    "/Users/lewisdrake/.nuget/packages/newtonsoft.json/13.0.1/newtonsoft.json.13.0.1.nupkg.sha512",
     "/Users/lewisdrake/.nuget/packages/nstack.core/1.0.3/nstack.core.1.0.3.nupkg.sha512",
     "/Users/lewisdrake/.nuget/packages/system.valuetuple/4.5.0/system.valuetuple.4.5.0.nupkg.sha512",
     "/Users/lewisdrake/.nuget/packages/terminal.gui/1.8.2/terminal.gui.1.8.2.nupkg.sha512"
