@@ -1,0 +1,4 @@
+Spell True
+Lengt 60
+Acron False
+Grama False

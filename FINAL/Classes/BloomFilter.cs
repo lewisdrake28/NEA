@@ -27,7 +27,7 @@ namespace BloomFilter
         // write the filter to a text file
         public void SetUp()
         {
-            string[] words = File.ReadAllLines("/Users/lewisdrake/Desktop/WordLists/V2/TrueWords.txt");
+            string[] words = File.ReadAllLines("Resources/TrueWords.txt");
 
             foreach (var a in words)
             {
@@ -40,7 +40,7 @@ namespace BloomFilter
         // write the filter to a text file
         protected void WriteFilter()
         {
-            string filename = "/Users/lewisdrake/Desktop/Bloom Filter/Resources/Filter.txt";
+            string filename = "Resources/Filter.txt";
             string[] stringArray = filter.Select(x => x.ToString()).ToArray();
             string result = String.Concat(stringArray);
 
@@ -53,7 +53,7 @@ namespace BloomFilter
         public BloomFilter()
         {
             // change filename to the <filter>.txt 
-            string filename = "/Users/lewisdrake/Desktop/Bloom Filter/Resources/Filter.txt";
+            string filename = "Resources/Filter.txt";
             string text = File.ReadAllText(filename);
 
             for (uint a = 0; a < filter.Length; a++)
