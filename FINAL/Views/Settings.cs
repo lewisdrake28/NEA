@@ -1,3 +1,7 @@
+///////////////////////
+// Views/Settings.cs //
+///////////////////////
+
 // install dependencies
 using Terminal.Gui;
 using System.IO;

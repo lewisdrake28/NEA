@@ -1,4 +1,8 @@
-// // install dependencies
+///////////////////////////
+// Views/SkeletonView.cs //
+///////////////////////////
+
+// install dependencies
 // using Terminal.Gui;
 
 // namespace FINAL

@@ -1,3 +1,7 @@
+/////////////////////////
+// Views/SpellCheck.cs //
+/////////////////////////
+
 // install dependencies
 using Terminal.Gui;
 

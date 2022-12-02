@@ -1,0 +1,1660 @@
+//////////////////
+// FINAL.csproj //
+//////////////////
+
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Terminal.Gui" Version="1.*" />
+  </ItemGroup>
+
+</Project>
+
+////////////////
+// Program.cs //
+////////////////
+
+// install dependencies
+// using FINAL;
+// using Terminal.Gui;
+// using BKTree;
+// using BloomFilter;
+// using DefineWords;
+// using Levenshtein;
+
+Application.Init();
+
+try
+{
+    string[] words = new string[2];
+    words[0] = "test";
+    words[1] = "this";
+
+    string[] words2 = new string[2];
+    words2[0] = "test";
+    words2[1] = "this";
+
+    Application.Run(new SpellCheck(words, words2));
+
+    // Application.Run(new Dictionary());
+}
+finally
+{
+    Application.Shutdown();
+}
+
+/////////////
+// Classes //
+/////////////
+
+///////////////////////
+// Classes/BKTree.cs //
+///////////////////////
+
+// install dependencies
+// using System.Collections;
+// using Levenshtein;
+
+// suppress warnings
+#pragma warning disable 
+
+namespace BKTree
+{
+
+    class BkTree
+    {
+        protected struct Connection
+        {
+            // node
+            public string word;
+            // edge to parent
+            public int weight;
+        }
+
+        protected static LevenshteinDistance leven = new LevenshteinDistance();
+        // each node has its own word, and a list of connections to store edge weights to children
+        protected static Dictionary<string, List<Connection>> tree = new Dictionary<string, List<Connection>>();
+        protected static string[] words = File.ReadAllLines("/Users/lewisdrake/Desktop/WordLists/V2/TrueWords.txt");
+        protected static int[] weights = new int[words.Length];
+        protected string root;
+
+        public BkTree(string root)
+        {
+            weights = leven.CalculateAll(root, words);
+
+            // create the tree where every word is a node
+            for (int a = 0; a < words.Length; a++)
+            {
+                if (tree.Count == 0)
+                {
+                    CreateRoot(root);
+                }
+                else
+                {
+                    if (root != tree.Keys.ElementAt(0))
+                    {
+                        AddNode(words, weights, a);
+                    }
+                }
+            }
+        }
+
+        protected void CreateRoot(string word)
+        {
+            Connection thisConnection = new Connection();
+            thisConnection.word = word;
+            // weight from root -> root = i (therefore 0)
+            thisConnection.weight = 0;
+
+            List<Connection> connections = new List<Connection>();
+            connections.Add(thisConnection);
+
+            tree.Add(word, connections);
+        }
+
+        public void AddNode(string[] words, int[] weights, int index)
+        {
+            Connection thisConnection = new Connection();
+            thisConnection.word = words[index];
+            thisConnection.weight = weights[index];
+
+            CreateNode(thisConnection.word, root, thisConnection.weight);
+        }
+
+        protected void CreateNode(string word, string parent, int weight)
+        {
+            // checks if an edge from the root node already exists with the same weight
+            // if it doesn't, then create node as nornmal from the root
+            // if it does, then use that node (that has the same weight) as the new parent
+            // due to the nature of BK-trees every edge from a parent must have a distinct weight
+            string? exists = CheckEdges(parent, weight);
+            if (exists != null)
+            {
+                // but weight from the parent might be different to the weight from the node, so recalculate
+                int newWeight = leven.Calculate(parent, word);
+                CreateNode(word, exists, newWeight);
+            }
+            else
+            {
+                Connection thisConnection = new Connection();
+                thisConnection.word = word;
+                thisConnection.weight = weight;
+
+                tree.Add(thisConnection.word, new List<Connection>());
+                tree[parent][tree[parent].Count] = thisConnection;
+            }
+        }
+
+        // search each edge from a specified parent to see if a particular weight already exists
+        protected string CheckEdges(string word, int weight)
+        {
+            List<int> edges = new List<int>();
+
+            for (int a = 0; a < tree[word].Count; a++)
+            {
+                edges.Add(tree[word][a].weight);
+            }
+
+            for (int a = 0; a < edges.Count; a++)
+            {
+                if (edges[a] == weight)
+                {
+                    return tree[word][a].word;
+                }
+            }
+
+            return null;
+        }
+
+        // input 1 when ReturnClosest is called in program
+        public List<string> ReturnClosest(int maxWeight)
+        {
+            List<string> words = new List<string>();
+            bool exists = false;
+
+            for (int a = 0; a < tree[root].Count; a++)
+            {
+                if (tree[root][a].weight == maxWeight)
+                {
+                    exists = true;
+                    // creates a new "sub-tree" and traverse it to return all children and sub-children
+                    words = BFS(tree[root][a].word);
+                }
+
+                // if the maxWeight doesn't exist from root
+                // then increase maxWeight and try again
+                // this will increase the allowed distance from root -> other words
+                if (!exists)
+                {
+                    maxWeight++;
+                    ReturnClosest(maxWeight);
+                }
+            }
+
+            return words;
+        }
+
+        // used as a traversal method rather than searching
+        protected List<string> BFS(string parent)
+        {
+            Queue queue = new Queue();
+            queue.Enqueue(parent);
+            List<string> words = new List<string>();
+            List<string> visited = new List<string>();
+            string word;
+
+            while (queue.Count != 0)
+            {
+                word = queue.Dequeue().ToString();
+                words.Add(word);
+                visited.Add(word);
+
+                for (int a = 0; a < tree[word].Count; a++)
+                {
+                    // if a node is unvisited, then add it to the queue to be vistsed soon
+                    if (visited.Contains(tree[word][a].word) == false)
+                    {
+                        queue.Enqueue(tree[word][a].word);
+                    }
+                }
+            }
+
+            return words;
+        }
+    }
+}
+
+////////////////////////////
+// Classes/BloomFilter.cs //
+////////////////////////////
+
+// install dependencies
+// using System.Text;
+
+// suppress warnings
+#pragma warning disable 
+
+namespace BloomFilter
+{
+
+    class BloomFilter
+    {
+        protected int[] filter = new int[2682974];
+
+        // FIRST TIME USE
+        // 
+        // constructor used to reset all indexes in the filter to 0
+        public BloomFilter(int num)
+        {
+            for (int a = 0; a < filter.Length; a++)
+            {
+                filter[a] = 0;
+            }
+        }
+
+        // reads the list of words from text file
+        // inserts each word into filter
+        // write the filter to a text file
+        public void SetUp()
+        {
+            string[] words = File.ReadAllLines("Resources/TrueWords.txt");
+
+            foreach (var a in words)
+            {
+                Insert(a);
+            }
+
+            WriteFilter();
+        }
+
+        // write the filter to a text file
+        protected void WriteFilter()
+        {
+            string filename = "Resources/Filter.txt";
+            string[] stringArray = filter.Select(x => x.ToString()).ToArray();
+            string result = String.Concat(stringArray);
+
+            File.WriteAllText(filename, result);
+        }
+
+        // GENERAL USE
+        // 
+        // read the filter from a text file and store as an int array
+        public BloomFilter()
+        {
+            // change filename to the <filter>.txt 
+            string filename = "Resources/Filter.txt";
+            string text = File.ReadAllText(filename);
+
+            for (uint a = 0; a < filter.Length; a++)
+            {
+                filter[a] = text[(int)a] - 48;
+            }
+        }
+
+        public bool Lookup(string word)
+        {
+            // there are only two one letter words that are in the set - "a" and "i"
+            // however all one letter words return true, so check all one letter words
+            if (word.Length == 1)
+            {
+                return (word == "a" || word == "i");
+                return false;
+            }
+            else
+            {
+                // if all the indexes are 1, then the item may be in the set
+                return (filter[Hash1(word)] == 1 && filter[Hash2(word)] == 1 && filter[Hash3(word)] == 1 && filter[Hash4(word)] == 1 && filter[Hash5(word)] == 1 && filter[Hash6(word)] == 1 && filter[Hash7(word)] == 1 && filter[Hash8(word)] == 1 && filter[Hash9(word)] == 1 && filter[Hash10(word)] == 1);
+            }
+
+            // if any of the indexes are 0, then the item is definitely not in the set
+            return false;
+        }
+
+        public void Insert(string word)
+        {
+            filter[Hash1(word)] = 1;
+            filter[Hash2(word)] = 1;
+            filter[Hash3(word)] = 1;
+            filter[Hash4(word)] = 1;
+            filter[Hash5(word)] = 1;
+            filter[Hash6(word)] = 1;
+            filter[Hash7(word)] = 1;
+            filter[Hash8(word)] = 1;
+            filter[Hash9(word)] = 1;
+            filter[Hash10(word)] = 1;
+        }
+
+        // Pearson Hashing
+        protected uint Hash1(string word)
+        {
+            uint hash = 0;
+            uint index;
+            byte[] bytes = Encoding.UTF8.GetBytes(word);
+            byte[] nums = { 114, 177, 249, 4, 222, 117, 190, 121, 130, 78, 53, 196, 255, 208, 5, 116, 221, 27, 144, 41, 252, 33, 170, 231, 62, 89, 235, 111, 174, 57, 105, 132, 204, 205, 151, 135, 90, 211, 37, 36, 66, 164, 40, 253, 108, 153, 98, 156, 67, 214, 35, 6, 38, 42, 162, 148, 28, 18, 254, 79, 61, 155, 3, 25, 184, 189, 152, 143, 84, 216, 87, 44, 75, 138, 191, 158, 243, 230, 1, 242, 91, 113, 26, 171, 245, 197, 22, 68, 187, 161, 218, 246, 97, 16, 234, 193, 73, 125, 101, 80, 226, 195, 139, 49, 9, 212, 224, 63, 72, 13, 100, 233, 104, 163, 207, 247, 137, 199, 136, 160, 203, 141, 250, 71, 200, 167, 129, 32, 19, 145, 238, 43, 142, 237, 198, 64, 76, 103, 182, 149, 2, 74, 107, 124, 88, 54, 157, 159, 51, 52, 102, 201, 7, 77, 180, 110, 109, 228, 85, 99, 11, 239, 169, 12, 8, 209, 165, 168, 248, 34, 82, 112, 140, 56, 120, 185, 55, 58, 31, 179, 47, 213, 86, 206, 194, 69, 127, 147, 123, 20, 219, 166, 29, 223, 220, 83, 70, 225, 188, 60, 21, 251, 240, 10, 119, 122, 23, 131, 96, 178, 227, 126, 173, 14, 17, 176, 192, 15, 46, 65, 215, 134, 232, 115, 106, 181, 175, 48, 202, 154, 150, 81, 50, 183, 39, 229, 92, 24, 217, 45, 172, 95, 128, 93, 133, 244, 210, 186, 118, 59, 30, 241, 146, 236, 94 };
+
+            foreach (var a in bytes)
+            {
+                // index = (hash ^ a) % (uint)nums.Length;
+                // hash = nums[index];
+
+                hash = nums[((hash ^ a) % (uint)nums.Length)];
+            }
+
+            hash %= (uint)filter.Length;
+            return hash;
+        }
+
+        // Hashing by cyclic polynomial (Buzhash)
+        protected uint Hash2(string word)
+        {
+            uint hash = 1;
+
+            foreach (char a in word)
+            {
+                hash = CircularShift(hash) ^ CircularShift((byte)a) ^ CircularShift((uint)(byte)a + 1);
+            }
+
+            hash %= (uint)filter.Length;
+            return hash;
+        }
+
+        // Fowler-Noll-Vo (FNV-0) hash 
+        protected uint Hash3(string word)
+        {
+            uint hash = 0;
+            byte[] bytes = Encoding.UTF8.GetBytes(word);
+
+            foreach (var a in bytes)
+            {
+                // hash *= 16777619;
+                // hash ^= a;
+
+                hash = (hash * 16777619) ^ a;
+            }
+
+            hash %= (uint)filter.Length;
+            return hash;
+        }
+
+        // dijb2
+        protected uint Hash4(string word)
+        {
+            // randomly generated number
+            uint hash = 5381;
+            uint a;
+            byte[] bytes = Encoding.UTF8.GetBytes(word);
+
+            foreach (var b in bytes)
+            {
+                hash = ((hash << 5) + hash) + 33;
+            }
+
+            hash %= (uint)filter.Length;
+            return hash;
+        }
+
+        // sdbm
+        protected uint Hash5(string word)
+        {
+            uint hash = 0;
+            byte[] bytes = Encoding.UTF8.GetBytes(word);
+
+            foreach (var a in bytes)
+            {
+                hash = 65599 + (hash << 6) + (hash << 16) - hash;
+            }
+
+            hash %= (uint)filter.Length;
+            return hash;
+        }
+
+        // PJW hash function
+        protected uint Hash6(string word)
+        {
+            uint hash = 0;
+            uint bits = (sizeof(uint) * 8);
+            uint max = (uint)(0xFFFFFFFF) << (int)(bits - (bits / 8));
+
+            for (int a = 0; a < word.Length; a++)
+            {
+                hash = hash << (int)(bits / 8) + word[a];
+
+                if (max != 0)
+                {
+                    hash = hash ^ (max >> (int)bits * 3 / 4) & (~max);
+                }
+            }
+
+            hash %= (uint)filter.Length;
+            return hash;
+        }
+
+        // Fast-Hash
+        protected uint Hash7(string word)
+        {
+            // randomly generated number
+            uint a = unchecked((uint)0x880355f21e6d1965);
+            uint hash = 144 ^ ((uint)word.Length * a);
+            uint b = 0;
+
+            for (uint c = 0; c < word.Length; c++)
+            {
+                hash = (hash ^ Mix(c)) * a;
+            }
+
+            int d = word.Length & 7;
+            int e = (d - 1) * 8;
+            if (e < 0)
+            {
+                e = 0;
+            }
+            b ^= (uint)word[d] << d;
+
+            hash ^= Mix(b) * a;
+            hash = Mix(hash);
+
+            hash %= (uint)filter.Length;
+            return (uint)hash;
+        }
+
+        // Rabin Fingerprint
+        protected uint Hash8(string word)
+        {
+            uint hash = word[0];
+            uint length = (uint)word.Length;
+
+            for (int a = 1; a < length; a++)
+            {
+                hash += (uint)Math.Pow(word[a] * length, a);
+            }
+
+            hash %= (uint)filter.Length;
+            return hash;
+        }
+
+        // Fletcher-32
+        protected uint Hash9(string word)
+        {
+            uint a = 0;
+            uint b = 0;
+
+            for (int c = 0; c < word.Length; c++)
+            {
+                a = (a + word[c] % (uint)0xffff);
+                b = (a + b) % (uint)0xffff;
+            }
+
+            uint hash = (b << 16) | a;
+
+            hash %= (uint)filter.Length;
+            return hash;
+        }
+
+        // CRC32
+        protected uint Hash10(string word)
+        {
+            // randomly generated number
+            uint hash = 0xffffffff;
+            uint index;
+            byte[] nums = { 114, 177, 249, 4, 222, 117, 190, 121, 130, 78, 53, 196, 255, 208, 5, 116, 221, 27, 144, 41, 252, 33, 170, 231, 62, 89, 235, 111, 174, 57, 105, 132, 204, 205, 151, 135, 90, 211, 37, 36, 66, 164, 40, 253, 108, 153, 98, 156, 67, 214, 35, 6, 38, 42, 162, 148, 28, 18, 254, 79, 61, 155, 3, 25, 184, 189, 152, 143, 84, 216, 87, 44, 75, 138, 191, 158, 243, 230, 1, 242, 91, 113, 26, 171, 245, 197, 22, 68, 187, 161, 218, 246, 97, 16, 234, 193, 73, 125, 101, 80, 226, 195, 139, 49, 9, 212, 224, 63, 72, 13, 100, 233, 104, 163, 207, 247, 137, 199, 136, 160, 203, 141, 250, 71, 200, 167, 129, 32, 19, 145, 238, 43, 142, 237, 198, 64, 76, 103, 182, 149, 2, 74, 107, 124, 88, 54, 157, 159, 51, 52, 102, 201, 7, 77, 180, 110, 109, 228, 85, 99, 11, 239, 169, 12, 8, 209, 165, 168, 248, 34, 82, 112, 140, 56, 120, 185, 55, 58, 31, 179, 47, 213, 86, 206, 194, 69, 127, 147, 123, 20, 219, 166, 29, 223, 220, 83, 70, 225, 188, 60, 21, 251, 240, 10, 119, 122, 23, 131, 96, 178, 227, 126, 173, 14, 17, 176, 192, 15, 46, 65, 215, 134, 232, 115, 106, 181, 175, 48, 202, 154, 150, 81, 50, 183, 39, 229, 92, 24, 217, 45, 172, 95, 128, 93, 133, 244, 210, 186, 118, 59, 30, 241, 146, 236, 94, 0 };
+
+            byte[] bytes = Encoding.UTF8.GetBytes(word);
+
+            foreach (var b in bytes)
+            {
+                index = ((hash ^ b) & 0xff) % (uint)nums.Length;
+                hash = (hash >> 8) ^ nums[index];
+            }
+
+            hash ^= 0xffffffff;
+
+            hash %= (uint)filter.Length;
+            return hash;
+        }
+
+        // helpers
+        // for hash2
+        protected uint CircularShift(uint a)
+        {
+            uint b = a << 1 | a >> 31;
+            return b;
+        }
+
+        // for hash7
+        protected uint Mix(uint hash)
+        {
+            long a = (long)hash;
+            a ^= a >> 23;
+            // randomly generated number
+            a *= 0x2127599bf4325c37;
+            a ^= a >> 47;
+
+            hash = (uint)a;
+            return (uint)hash;
+        }
+    }
+}
+
+////////////////////////////
+// Classes/DefineWords.cs //
+////////////////////////////
+
+// install dependencies
+// using System.Net;
+// using Newtonsoft.Json;
+
+// suppress warnings
+#pragma warning disable 
+
+namespace DefineWords
+{
+    // create template to store JSON data retruned by API call
+    class Word
+    {
+        public string? word { get; set; }
+        public string? phonetic { get; set; }
+        public List<Phonetics>? phonetics { get; set; }
+        public List<Meanings>? meanings { get; set; }
+        public License? license { get; set; }
+        public List<string>? sourceUrls { get; set; }
+    }
+
+    class Phonetics
+    {
+        public string? text { get; set; }
+        public string? audio { get; set; }
+        public string? sourceUrl { get; set; }
+        public License? license { get; set; }
+    }
+
+    class License
+    {
+        public string? name { get; set; }
+        public string? url { get; set; }
+    }
+
+    class Meanings
+    {
+        public string? partOfSpeech { get; set; }
+        public List<Definitions>? definitions { get; set; }
+        public List<string>? synonyms { get; set; }
+        public List<string>? antonyms { get; set; }
+    }
+
+    class Definitions
+    {
+        public string? definition { get; set; }
+        public List<string>? synonyms { get; set; }
+        public List<string>? antonyms { get; set; }
+        public string? example { get; set; }
+    }
+
+    class Program
+    {
+        public static List<string> DefineWord(string toDefine)
+        {
+            WebRequest request = WebRequest.Create("https://api.dictionaryapi.dev/api/v2/entries/en/" + toDefine);
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            Stream dataStream = response.GetResponseStream();
+
+            StreamReader reader = new StreamReader(dataStream);
+            string responseFromServer = reader.ReadToEnd();
+            IEnumerable<Word>? iword = JsonConvert.DeserializeObject<IEnumerable<Word>>(responseFromServer);
+            Word[] aword = new List<Word>(iword).ToArray();
+            Word word = aword[0];
+
+            // makes sure there is only one definition for each word type
+            Dictionary<string, string> definitions = new Dictionary<string, string>()
+            {
+                {"noun", "null"},
+                {"pronoun", "null"},
+                {"verb", "null"},
+                {"adjective", "null"},
+                {"adverb", "null"},
+                {"preposition", "null"},
+                {"conjunction", "null"},
+                {"interjection", "null"},
+            };
+
+            // if the definition stored for the word type is null, then store the definiton
+            for (int a = 0; a < word.meanings.Count; a++)
+            {
+                if (definitions[word.meanings[a].partOfSpeech] == "null")
+                {
+                    definitions[word.meanings[a].partOfSpeech] = word.meanings[a].definitions[0].definition;
+                }
+            }
+
+            // convert values in dictionary to list
+            List<string> finals = new List<string>();
+            foreach (KeyValuePair<string, string> kvPair in definitions)
+            {
+                if (kvPair.Value != "null")
+                {
+                    string key = char.ToUpper(kvPair.Key[0]) + kvPair.Key.Substring(1);
+                    finals.Add(key + " - " + kvPair.Value);
+                }
+            }
+
+            return finals;
+        }
+
+        static void Main(string[] args)
+        {
+            string word = Console.ReadLine();
+            List<string> definitions = DefineWord(word);
+            foreach (var definition in definitions)
+            {
+                Console.WriteLine(definition);
+            }
+        }
+    }
+}
+
+////////////////////////////
+// Classes/Levenshtein.cs //
+////////////////////////////
+
+// install dependencies
+
+// suppress warnings
+#pragma warning disable 
+
+namespace Levenshtein
+{
+
+    class LevenshteinDistance
+    {
+        protected int distance;
+
+        public LevenshteinDistance()
+        {
+            distance = 0;
+        }
+
+        public int Calculate(string a, string b)
+        {
+            int cost;
+
+            // if a or b has no length, return the other one
+            if (a.Length == 0)
+            {
+                return b.Length;
+            }
+            else if (b.Length == 0)
+            {
+                return a.Length;
+            }
+
+            // row and column sizes are (word.Length + 1) because row/column 1 store index values
+            int[,] matrix = new int[a.Length + 1, b.Length + 1];
+
+            // store index values in row/coilumn 1, example
+            // 0 1 ...
+            // 1
+            // 2
+            // ...
+            for (int c = 0; c < matrix.GetLength(0); c++)
+            {
+                matrix[c, 0] = c;
+                for (int d = 0; d < matrix.GetLength(1); d++)
+                {
+                    matrix[0, d] = d;
+                }
+            }
+
+            for (int c = 1; c < matrix.GetLength(0); c++)
+            {
+                for (int d = 1; d < matrix.GetLength(1); d++)
+                {
+                    // if the values at the index are the same then no change is needed
+                    if (a[c - 1] == b[d - 1])
+                    {
+                        cost = 0;
+                    }
+                    // if not then a change (substitution, deletion or addition) is needed
+                    else
+                    {
+                        cost = 1;
+                    }
+
+                    int value1 = matrix[c - 1, d] + 1;
+                    int value2 = matrix[c, d - 1] + 1;
+                    int value3 = matrix[c - 1, d - 1] + cost;
+                    int[] values = { value1, value2, value3 };
+                    matrix[c, d] = values.Min();
+                }
+            }
+
+            // final cost is stored in the bottom right of the matrix
+            distance = matrix[a.Length, b.Length];
+            return distance;
+        }
+
+        public int[] CalculateAll(string a, string[] words)
+        {
+            int[] distances = new int[words.Length];
+
+            for (int b = 0; b < words.Length; b++)
+            {
+                distances[b] = Calculate(a, words[b]);
+            }
+
+            return distances;
+        }
+    }
+}
+
+////////////////////
+// View designers //
+////////////////////
+
+///////////////////////////////////////////
+// View designers/Dictionary.Designer.cs //
+///////////////////////////////////////////
+
+// install dependencies
+// using System;
+// using Terminal.Gui;
+// using NStack;
+// using System.Collections.Generic;
+
+namespace FINAL
+{
+    public partial class Dictionary : MasterView
+    {
+        protected Button lookupBtn = new Button();
+        protected Button nextBtn = new Button();
+        protected Button prevBtn = new Button();
+        protected Button defineBtn = new Button();
+        protected Button addBtn = new Button();
+        protected Button removeBtn = new Button();
+        protected Button filterBtn = new Button();
+
+        protected Label[] wordLabs = new Label[101988];
+
+        protected RadioGroup filterRad = new RadioGroup();
+
+        protected TextField lookupTxt = new TextField();
+
+        protected void InitializeComponent()
+        {
+            // build lookup elements 
+            lookupTxt.X = 50;
+            lookupTxt.Y = 4;
+            lookupTxt.Width = 14;
+
+            lookupBtn.Text = "Lookup";
+            lookupBtn.X = lookupTxt.X;
+            lookupBtn.Y = lookupTxt.Y + 2;
+
+            Add(lookupBtn, lookupTxt);
+
+            // build navigation elements
+            nextBtn.Text = "Next page";
+            nextBtn.X = 64;
+            nextBtn.Y = 21;
+
+            prevBtn.Text = "Prev page";
+            prevBtn.X = nextBtn.X - 14;
+            prevBtn.Y = nextBtn.Y;
+
+            Add(prevBtn, nextBtn);
+
+            // build functional buttons
+            defineBtn.X = lookupTxt.X;
+            defineBtn.Y = lookupBtn.Y + 2;
+            defineBtn.Text = "Define word";
+
+            addBtn.X = lookupTxt.X;
+            addBtn.Y = defineBtn.Y + 2;
+            addBtn.Text = "Add word";
+
+            removeBtn.X = lookupTxt.X;
+            removeBtn.Y = addBtn.Y + 2;
+            removeBtn.Text = "Remove word";
+
+            Add(defineBtn, addBtn, removeBtn);
+
+            // build fitering elements
+            filterRad.X = lookupTxt.X;
+            filterRad.Y = removeBtn.Y + 2;
+            filterRad.RadioLabels = new ustring[] { "All words", "Default words", "Added words" };
+
+            filterBtn.X = lookupTxt.X;
+            filterBtn.Y = filterRad.Y + 4;
+            filterBtn.Text = "Filter list";
+
+            Add(filterRad, filterBtn);
+        }
+    }
+}
+
+/////////////////////////////////////////
+// View designers/MainView.Designer.cs //
+/////////////////////////////////////////
+
+// install dependencies
+// using System;
+// using Terminal.Gui;
+
+namespace FINAL
+{
+    public partial class MainView : MasterView
+    {
+        protected Button settingsBtn = new Button();
+        protected Button spellBtn = new Button();
+
+        protected TextView textEntry = new TextView();
+
+        protected void InitializeComponent()
+        {
+            textEntry.X = 1;
+            textEntry.Y = 2;
+            textEntry.Width = 76;
+            textEntry.Height = 5;
+            textEntry.WordWrap = true;
+
+            Add(textEntry);
+
+            settingsBtn.Text = "Settings";
+            settingsBtn.X = 1;
+            settingsBtn.Y = 20;
+
+            spellBtn.Text = "Spell check";
+            spellBtn.X = settingsBtn.X + 13;
+            spellBtn.Y = settingsBtn.Y;
+
+            Add(settingsBtn, spellBtn);
+        }
+    }
+}
+
+///////////////////////////////////////////
+// View designers/MasterView.Designer.cs //
+///////////////////////////////////////////
+
+// install dependencies
+// using System;
+// using Terminal.Gui;
+
+namespace FINAL
+{
+    public partial class MasterView : Window
+    {
+        protected void Build()
+        {
+            Title = "Spell Checker " + this;
+
+            var menuBar = new MenuBar(new MenuBarItem[] {
+                new MenuBarItem("_File", new MenuItem[] {
+                    new MenuItem("_Quit", "", () => {
+                        // Application.RequestStop();
+                        Application.Shutdown();
+                    })
+                })
+            });
+            Add(menuBar);
+        }
+    }
+}
+
+/////////////////////////////////////////
+// View designers/Settings.Designer.cs //
+/////////////////////////////////////////
+
+// install dependencies
+// using System;
+// using Terminal.Gui;
+// using System.IO;
+// using NStack;
+
+namespace FINAL
+{
+    public partial class Settings : MasterView
+    {
+        protected Button viewDictBtn = new Button();
+        protected Button saveBtn = new Button();
+        protected Button homeBtn = new Button();
+
+        protected CheckBox spellCheckCbx = new CheckBox();
+        protected CheckBox changeAcronymsCbx = new CheckBox();
+        protected CheckBox grammarCheckCbx = new CheckBox();
+
+        protected Label spellCheckLab = new Label();
+        protected Label viewDictLab = new Label();
+        protected Label maxLengthLab = new Label();
+        protected Label changeAcryonymsLab = new Label();
+        protected Label grammarCheckLab = new Label();
+
+        protected TextField maxLengthTxt = new TextField();
+
+        protected void InitializeComponent()
+        {
+            // build labels
+            spellCheckLab.Text = "Spell check";
+            spellCheckLab.X = 2;
+            spellCheckLab.Y = 2;
+
+            viewDictLab.Text = "View dictionary";
+            viewDictLab.X = spellCheckLab.X;
+            viewDictLab.Y = spellCheckLab.Y + 2;
+
+            maxLengthLab.Text = "Maximum length";
+            maxLengthLab.X = spellCheckLab.X;
+            maxLengthLab.Y = viewDictLab.Y + 2;
+
+            changeAcryonymsLab.Text = "Change acronyms";
+            changeAcryonymsLab.X = spellCheckLab.X;
+            changeAcryonymsLab.Y = maxLengthLab.Y + 2;
+
+            grammarCheckLab.Text = "Grammar check";
+            grammarCheckLab.X = spellCheckLab.X;
+            grammarCheckLab.Y = changeAcryonymsLab.Y + 2;
+
+            Add(spellCheckLab, viewDictLab, maxLengthLab, changeAcryonymsLab, grammarCheckLab);
+
+            // build check boxes
+            spellCheckCbx.X = spellCheckLab.X + 20;
+            spellCheckCbx.Y = spellCheckLab.Y;
+            spellCheckCbx.Checked = spellCheck;
+
+            changeAcronymsCbx.X = spellCheckCbx.X;
+            changeAcronymsCbx.Y = changeAcryonymsLab.Y;
+            changeAcronymsCbx.Checked = changeAcronyms;
+
+            grammarCheckCbx.X = spellCheckCbx.X;
+            grammarCheckCbx.Y = grammarCheckLab.Y;
+            grammarCheckCbx.Checked = grammarCheck;
+
+            Add(spellCheckCbx, changeAcronymsCbx, grammarCheckCbx);
+
+            // build buttons
+            viewDictBtn.Text = "View";
+            viewDictBtn.X = spellCheckCbx.X;
+            viewDictBtn.Y = viewDictLab.Y;
+
+            saveBtn.Text = "_Save";
+            saveBtn.X = maxLengthLab.X;
+            saveBtn.Y = grammarCheckLab.Y + 2;
+            saveBtn.IsDefault = true;
+
+            homeBtn.Text = "Home";
+            homeBtn.X = maxLengthLab.X;
+            homeBtn.Y = saveBtn.Y + 2;
+
+            Add(viewDictBtn, saveBtn, homeBtn);
+
+            // build text fields
+            maxLengthTxt.X = spellCheckCbx.X;
+            maxLengthTxt.Y = maxLengthLab.Y;
+            maxLengthTxt.Width = 8;
+            maxLengthTxt.Text = maxLength.ToString();
+
+            Add(maxLengthTxt);
+        }
+    }
+}
+
+/////////////////////////////////////////////
+// View designers/SkeletonView.Designer.cs //
+/////////////////////////////////////////////
+
+// install dependencies
+// using System;
+// using Terminal.Gui;
+
+namespace FINAL
+{
+    public partial class SkeletonView : MasterView
+    {
+        protected void InitializeComponent()
+        {
+
+        }
+    }
+}
+
+////////////////////////////////////////////
+// View designers/SkeletonView.Designer.cs //
+////////////////////////////////////////////
+
+// install dependencies
+// using System;
+// using Terminal.Gui;
+
+namespace FINAL
+{
+    public partial class SpellCheck : MasterView
+    {
+        protected Button lookupBtn = new Button();
+        protected Button ignoreBtn = new Button();
+        protected Button userBtn = new Button();
+        protected Button acronymBtn = new Button();
+
+        protected Label lookupLab = new Label();
+        protected Label lookupLab2 = new Label();
+        protected Label lookupLab3 = new Label();
+        protected Label userLab = new Label();
+        protected List<Label> wordLabs = new List<Label>();
+
+        protected TextField lookupTxt = new TextField();
+        protected TextField userTxt = new TextField();
+
+        protected void InitializeComponent()
+        {
+            // build lookup elements
+            lookupLab.X = 50;
+            lookupLab.Y = 2;
+            lookupLab.Text = "Enter word from left side";
+
+            lookupLab2.X = lookupLab.X;
+            lookupLab2.Y = lookupLab.Y + 1;
+            lookupLab2.Text = "in the field below. Press";
+
+            lookupLab3.X = lookupLab.X;
+            lookupLab3.Y = lookupLab2.Y + 1;
+            lookupLab3.Text = "enter, then handle error";
+
+            lookupTxt.X = lookupLab.X;
+            lookupTxt.Y = lookupLab3.Y + 2; ;
+            lookupTxt.Width = 14;
+
+            lookupBtn.X = lookupLab.X;
+            lookupBtn.Y = lookupTxt.Y + 2;
+            lookupBtn.Text = "Enter";
+
+            Add(lookupLab, lookupLab2, lookupLab3, lookupTxt, lookupTxt, lookupBtn);
+
+            // build ignore error elements
+            ignoreBtn.X = lookupLab.X;
+            ignoreBtn.Y = lookupBtn.Y + 2;
+            ignoreBtn.Text = "Ignore error";
+
+            Add(ignoreBtn);
+
+            // build change error to user word elements
+            userLab.X = lookupLab.X;
+            userLab.Y = ignoreBtn.Y + 2;
+            userLab.Text = "Enter new word";
+
+            userTxt.X = lookupLab.X;
+            userTxt.Y = userLab.Y + 2;
+            userTxt.Width = 14;
+
+            userBtn.X = lookupLab.X;
+            userBtn.Y = userTxt.Y + 2;
+            userBtn.Text = "Replace";
+
+            Add(userLab, userTxt, userBtn);
+
+            // build replace acronyms elements 
+            acronymBtn.X = lookupLab.X;
+            acronymBtn.Y = userBtn.Y + 2;
+            acronymBtn.Text = "Replace acronyms";
+
+            Add(acronymBtn);
+        }
+    }
+}
+
+///////////
+// Views //
+///////////
+
+/////////////////////////
+// Views/Dictionary.cs //
+/////////////////////////
+
+// install dependencies
+// using Terminal.Gui;
+// using System.IO;
+// using System.Collections.Generic;
+// using DefineWords;
+// using System.Linq;
+
+namespace FINAL
+{
+
+    public partial class Dictionary
+    {
+        public string[] words;
+        protected string? currentLookup;
+
+        protected int firstIndex;
+        protected int currentFilter;
+
+        protected List<string> toDisplay = new List<string>();
+
+        public Dictionary()
+        {
+            words = FetchAllWords();
+            firstIndex = 0;
+            currentFilter = filterRad.SelectedItem;
+
+            UpdateWords();
+
+            InitializeComponent();
+
+            lookupBtn.Clicked += () => { Lookup(0); };
+
+            nextBtn.Clicked += () => { NextPage(); };
+
+            prevBtn.Clicked += () => { PrevPage(); };
+
+            defineBtn.Clicked += () =>
+            {
+                currentLookup = lookupTxt.Text.ToString();
+
+                if (currentLookup != null)
+                {
+                    DefineThis(currentLookup);
+                }
+                else
+                {
+                    MessageBox.ErrorQuery("Error", "There is no word to define\nEnter a value in the lookup field", "Ok");
+                }
+            };
+
+            addBtn.Clicked += () =>
+            {
+                currentLookup = lookupTxt.Text.ToString();
+
+                if (currentLookup != null && !currentLookup.Contains(" "))
+                {
+                    AddThis(currentLookup);
+                    UpdateWords();
+                }
+                else
+                {
+                    MessageBox.ErrorQuery("Error", "There is no word to add to the dictionary\nEnter a value in the lookup field", "Ok");
+                }
+            };
+
+            removeBtn.Clicked += () =>
+            {
+                currentLookup = lookupTxt.Text.ToString();
+                if (currentLookup != null)
+                {
+                    RemoveThis(currentLookup);
+                    UpdateWords();
+                }
+                else
+                {
+                    MessageBox.ErrorQuery("Error", "There is no word to remove fomr the dictionary\nEnter a value in the lookup field", "Ok");
+                }
+            };
+
+            // filterBtn.Clicked += () => MessageBox.Query("title", filterRad.SelectedItem.ToString(), "Ok"); //FilterList(filterRad.SelectedItem); 
+            filterBtn.Clicked += () =>
+            {
+                currentFilter = filterRad.SelectedItem;
+                UpdateWords();
+            };
+        }
+
+        protected string[] FetchAllWords()
+        {
+            string defPath = "Resources/TrueWords.txt";
+            string addedPath = "Resources/AddedWords.txt";
+
+            List<string> words = File.ReadAllLines(defPath).ToList();
+            List<string> addedWords = File.ReadAllLines(addedPath).ToList();
+            words.AddRange(addedWords);
+            words.Sort();
+            string[] values = words.ToArray();
+
+            return values;
+        }
+
+        protected string[] FetchWords(int num)
+        {
+            string path;
+
+            if (num == 1)
+            {
+                path = "Resources/TrueWords.txt";
+            }
+            else
+            {
+                path = "Resources/AddedWords.txt";
+            }
+
+            words = File.ReadAllLines(path);
+            return words;
+        }
+
+        protected void NextPage()
+        {
+            firstIndex += 20;
+            if ((toDisplay == null && firstIndex > words.Length) || (toDisplay != null && firstIndex > toDisplay.Count))
+            {
+                firstIndex -= 20;
+            }
+
+            Lookup(firstIndex);
+        }
+
+        protected void PrevPage()
+        {
+            if (firstIndex != 0)
+            {
+                firstIndex = firstIndex - 20;
+            }
+
+            Lookup(firstIndex);
+        }
+
+        protected void Lookup(int firstIndexIn)
+        {
+            firstIndex = firstIndexIn;
+            currentLookup = lookupTxt.Text.ToString();
+
+            UpdateWords();
+        }
+
+        protected void UpdateWords()
+        {
+            if (currentFilter == 0)
+            {
+                FetchAllWords();
+            }
+            else
+            {
+                FetchWords(currentFilter);
+            }
+
+            foreach (var a in wordLabs)
+            {
+                Remove(a);
+            }
+            toDisplay.Clear();
+
+            if (currentLookup == null)
+            {
+                toDisplay = words.ToList();
+            }
+
+            else
+            {
+                for (int a = 0; a < words.Length; a++)
+                {
+                    if (words[a].StartsWith(currentLookup))
+                    {
+                        toDisplay.Add(words[a]);
+                    }
+                }
+            }
+
+            DisplayLabels(toDisplay);
+        }
+
+        protected void DisplayLabels(List<string> toDisplay)
+        {
+            int yPos = 2;
+            int count = 0;
+            int thisIndex = firstIndex;
+            int lastIndex = firstIndex + 20;
+
+            while (thisIndex < lastIndex)
+            {
+                if (thisIndex < toDisplay.Count)
+                {
+                    wordLabs[count] = new Label();
+                    wordLabs[count].X = 2;
+                    wordLabs[count].Y = yPos;
+                    wordLabs[count].Text = toDisplay[thisIndex];
+
+                    Add(wordLabs[count]);
+                }
+                else
+                {
+                    break;
+                }
+
+                count++;
+                yPos++;
+                thisIndex++;
+            }
+        }
+
+        protected void DefineThis(string word)
+        {
+            try
+            {
+                List<string> definitions = DefineWords.Program.DefineWord(word);
+
+                string definitionstring = "";
+                for (int a = 0; a < definitions.Count; a++)
+                {
+                    definitionstring += definitions[a];
+                    definitionstring += "\n";
+                }
+
+                MessageBox.Query("Definitions of " + word, definitionstring, "Ok");
+            }
+            catch (Exception e)
+            {
+                MessageBox.ErrorQuery("Error", "Word could not be defined\n" + e.Message, "Ok");
+            }
+        }
+
+        protected void AddThis(string word)
+        {
+            string path = "Resources/AddedWords.txt";
+            string[] words = File.ReadAllLines(path);
+
+            if (!words.Contains(word))
+            {
+                List<string> newWords = new List<string>();
+
+                newWords = words.ToList();
+                newWords.Add(word);
+                newWords.Sort();
+
+                string[] toWrite = newWords.ToArray();
+                File.WriteAllLines(path, toWrite);
+            }
+
+            MessageBox.Query("Word added", word + " has been added to the dictionary", "Ok");
+        }
+
+        protected void RemoveThis(string word)
+        {
+            string path = "/Users/lewisdrake/NEA/FINAL/Resources/AddedWords.txt";
+            string[] words = File.ReadAllLines(path);
+
+            if (words.Contains(word))
+            {
+                List<string> newWords = new List<string>();
+
+                newWords = words.ToList();
+                newWords.Remove(word);
+                newWords.Sort();
+
+                string[] toWrite = newWords.ToArray();
+                File.WriteAllLines(path, toWrite);
+            }
+
+            MessageBox.Query("Word removed", word + " has been removed from the dictionary", "Ok");
+        }
+
+        protected void FilterList(int choice)
+        {
+            if (choice == 1)
+            {
+                string path = "Resources/TrueWords.txt";
+                string[] words = File.ReadAllLines(path);
+            }
+            if (choice == 2)
+            {
+                string path = "Resources/AddedWords.txt";
+                string[] words = File.ReadAllLines(path);
+            }
+
+            UpdateWords();
+        }
+    }
+}
+
+///////////////////////
+// Views/MainView.cs //
+///////////////////////
+
+// install dependencies
+// using Terminal.Gui;
+// using BloomFilter;
+
+namespace FINAL
+{
+
+    public partial class MainView
+    {
+        public MainView()
+        {
+            InitializeComponent();
+
+            settingsBtn.Clicked += () => Application.Run(new Settings());
+            spellBtn.Clicked += () => CheckSpelling();
+        }
+
+        protected void CheckSpelling()
+        {
+            BloomFilter.BloomFilter bloom = new BloomFilter.BloomFilter();
+            string text = textEntry.Text.ToString()!;
+            string[] words = text.Split(' ');
+            List<string> falseWords = new List<string>();
+
+            for (int a = 0; a < words.Length; a++)
+            {
+                if (!bloom.Lookup(words[a]))
+                {
+                    falseWords.Add(words[a]);
+                }
+            }
+        }
+    }
+}
+
+/////////////////////////
+// Views/MasterView.cs //
+/////////////////////////
+
+// install dependencies
+// using Terminal.Gui;
+
+namespace FINAL
+{
+
+    public partial class MasterView
+    {
+        public MasterView()
+        {
+            Build();
+        }
+    }
+}
+
+///////////////////////
+// Views/Settings.cs //
+///////////////////////
+
+// install dependencies
+// using Terminal.Gui;
+// using System.IO;
+
+namespace FINAL
+{
+
+    public partial class Settings
+    {
+        public bool spellCheck;
+        public int maxLength;
+        public bool changeAcronyms;
+        public bool grammarCheck;
+
+        public Settings()
+        {
+            FetchSettings();
+
+            InitializeComponent();
+
+            saveBtn.Clicked += () => { SaveSettings(); };
+            viewDictBtn.Clicked += () => { Application.Run(new Dictionary()); };
+            saveBtn.Clicked += () => { Application.Run(new MainView()); };
+        }
+
+        protected void SaveSettings()
+        {
+            spellCheck = spellCheckCbx.Checked;
+            changeAcronyms = changeAcronymsCbx.Checked;
+            grammarCheck = grammarCheckCbx.Checked;
+
+            if (!int.TryParse(maxLengthTxt.Text.ToString(), out maxLength))
+            {
+                MessageBox.ErrorQuery("Error", "The input for max length must be a whole number\nFor no max length, enter 0", "Ok");
+
+                return;
+            }
+
+            string settings = "Spell " + spellCheck + "\n"
+                + "Lengt " + maxLength + "\n"
+                + "Acron " + changeAcronyms + "\n"
+                + "Grama " + grammarCheck + "\n";
+
+            string path = "Resources/Settings.txt";
+            File.WriteAllText(path, settings);
+
+            MessageBox.Query("Saved", "Settings saved successfully", "Ok");
+        }
+
+        protected void FetchSettings()
+        {
+            string path = "Resources/Settings.txt";
+            string[] settings = File.ReadAllLines(path);
+
+            spellCheck = bool.Parse(settings[0].Substring(6));
+            maxLength = int.Parse(settings[1].Substring(6));
+            changeAcronyms = bool.Parse(settings[2].Substring(6));
+            grammarCheck = bool.Parse(settings[3].Substring(6));
+        }
+    }
+}
+
+///////////////////////////
+// Views/SkeletonView.cs //
+///////////////////////////
+
+// install dependencies
+// using Terminal.Gui;
+
+namespace FINAL
+{
+
+    public partial class SkeletonView
+    {
+        public SkeletonView()
+        {
+            InitializeComponent();
+        }
+    }
+}
+
+/////////////////////////
+// Views/SpellCheck.cs //
+/////////////////////////
+
+// install dependencies
+// using Terminal.Gui;
+
+namespace FINAL
+{
+
+    public partial class SpellCheck
+    {
+        protected int firstIndex;
+
+        protected string? error;
+        protected List<string> falseWords = new List<string>();
+        protected List<string> words = new List<string>();
+
+        public SpellCheck(string[] flaseWordsIn, string[] wordsIn)
+        {
+            falseWords = flaseWordsIn.ToList();
+            words = wordsIn.ToList();
+
+            DisplayWords();
+
+            InitializeComponent();
+
+            lookupBtn.Clicked += () => { error = lookupTxt.Text.ToString(); };
+
+            ignoreBtn.Clicked += () =>
+            {
+                error = lookupTxt.Text.ToString();
+
+                if (error != null)
+                {
+                    falseWords.Remove(error);
+
+                    DisplayWords();
+
+                    MessageBox.Query("Ignored", error + " has been ignored as an error", "Ok");
+                }
+            };
+
+            acronymBtn.Clicked += () => { ReaplceAcronyms(); };
+        }
+
+        protected void DisplayWords()
+        {
+            int xPos = 2;
+            int yPos = 2;
+            int thisIndex = firstIndex;
+
+            foreach (var a in wordLabs)
+            {
+                Remove(a);
+            }
+            wordLabs.Clear();
+
+            for (int a = 0; a < 41; a++)
+            {
+                if (thisIndex < falseWords.Count)
+                {
+                    wordLabs.Add(new Label());
+                    wordLabs[a] = new Label();
+                    wordLabs[a].X = xPos;
+                    wordLabs[a].Y = yPos;
+                    wordLabs[a].Text = falseWords[thisIndex];
+
+                    Add(wordLabs[a]);
+
+                    yPos++;
+                    thisIndex++;
+                }
+
+                if (yPos == 22)
+                {
+                    xPos = 30;
+                    yPos = 2;
+                }
+            }
+        }
+
+        protected void ReaplceAcronyms()
+        {
+            string path = "Resources/Acronyms.txt";
+            string[] acronyms = File.ReadAllLines(path);
+            string[] shortAcr = new string[acronyms.Length];
+            string[] fullAcr = new string[acronyms.Length];
+
+            for (int a = 0; a < acronyms.Length; a++)
+            {
+                int starIndex = acronyms[a].IndexOf('*');
+                shortAcr[a] = acronyms[a].Substring(0, starIndex - 1);
+                fullAcr[a] = acronyms[a].Substring(starIndex + 1);
+            }
+
+            for (int a = 0; a < words.Count; a++)
+            {
+                for (int b = 0; b < acronyms.Length; b++)
+                {
+                    if (words[a] == shortAcr[b])
+                    {
+                        words[a] = fullAcr[b];
+                    }
+                }
+            }
+        }
+    }
+}

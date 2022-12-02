@@ -1,3 +1,7 @@
+/////////////////////////
+// Views/MasterView.cs //
+/////////////////////////
+
 // install dependencies
 using Terminal.Gui;
 

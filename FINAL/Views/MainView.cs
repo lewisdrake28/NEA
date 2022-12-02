@@ -1,3 +1,7 @@
+///////////////////////
+// Views/MainView.cs //
+///////////////////////
+
 // install dependencies
 using Terminal.Gui;
 using BloomFilter;

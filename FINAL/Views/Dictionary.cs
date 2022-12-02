@@ -1,3 +1,7 @@
+/////////////////////////
+// Views/Dictionary.cs //
+/////////////////////////
+
 // install dependencies
 using Terminal.Gui;
 using System.IO;

@@ -1,3 +1,7 @@
+/////////////////////////////////////////
+// View designers/MainView.Designer.cs //
+/////////////////////////////////////////
+
 // install dependencies
 using System;
 using Terminal.Gui;
@@ -33,3 +37,4 @@ namespace FINAL
         }
     }
 }
+

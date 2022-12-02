@@ -1,3 +1,7 @@
+////////////////////////////
+// Classes/DefineWords.cs //
+////////////////////////////
+
 // install dependencies
 using System.Net;
 using Newtonsoft.Json;

@@ -1,4 +1,8 @@
-﻿// install dependencies
+﻿////////////////
+// Program.cs //
+////////////////
+
+// install dependencies
 using FINAL;
 using Terminal.Gui;
 using BKTree;
@@ -14,7 +18,11 @@ try
     words[0] = "test";
     words[1] = "this";
 
-    Application.Run(new SpellCheck(words));
+    string[] words2 = new string[2];
+    words2[0] = "test";
+    words2[1] = "this";
+
+    Application.Run(new SpellCheck(words, words2));
 
     // Application.Run(new Dictionary());
 }

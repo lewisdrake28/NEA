@@ -1,3 +1,7 @@
+////////////////////////////
+// Classes/BloomFilter.cs //
+////////////////////////////
+
 // install dependencies
 using System.Text;
 
