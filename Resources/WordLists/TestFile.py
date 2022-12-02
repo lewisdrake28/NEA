@@ -28,17 +28,21 @@ for a in f:
         response = requests.get(URL)
         statusCode = response.status_code
 
-        #check the status code
+        # OK - assume the word is a true word
         if statusCode < 400:
-            #OK - assume the word is a true word
             trueWords.append(a)
+            
+        # Not Found - assume the word is a false word
         elif statusCode == 404:
-            #Not Found - assume the word is a false word
             falseWords.append(a)
+            
+        # all other status codes
+        # check manually later/retry
         else:
-            #all other status codes
-            #check manually later/retry
             checkWords.append(a)
+            
+    # error when trying to make API call
+    # check manually later/retry
     except:
         now = datetime.now()
         print(now)
