@@ -5,6 +5,7 @@
 // install dependencies
 using System;
 using Terminal.Gui;
+using BKTree;
 
 namespace FINAL
 {
@@ -14,6 +15,7 @@ namespace FINAL
         protected Button ignoreBtn = new Button();
         protected Button userBtn = new Button();
         protected Button acronymBtn = new Button();
+        protected Button bktree = new Button();
 
         protected Label lookupLab = new Label();
         protected Label lookupLab2 = new Label();
@@ -77,6 +79,11 @@ namespace FINAL
             acronymBtn.Text = "Replace acronyms";
 
             Add(acronymBtn);
+
+            bktree.X = Pos.Center();
+            bktree.Y = Pos.Center();
+            bktree.Text = "BK-Tree";
+            Add(bktree);
         }
     }
 }

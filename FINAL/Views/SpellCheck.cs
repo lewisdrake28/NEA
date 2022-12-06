@@ -42,6 +42,20 @@ namespace FINAL
             };
 
             acronymBtn.Clicked += () => { ReaplceAcronyms(); };
+
+            bktree.Clicked += () =>
+            {
+                BKTree.BkTree tree = new BKTree.BkTree("this");
+                List<string> words = tree.ReturnClosest(1);
+                string text = "";
+
+                for (int a = 0; a < words.Count; a++)
+                {
+                    text += words[a] + "\n";
+                }
+
+                MessageBox.Query(words.Count.ToString(), text, "OK");
+            };
         }
 
         protected void DisplayWords()

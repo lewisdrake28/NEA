@@ -125,7 +125,7 @@ namespace BKTree
 
             for (int a = 0; a < tree[root].Count; a++)
             {
-                if (tree[root][a].weight == maxWeight)
+                if (tree[root][a].weight < maxWeight)
                 {
                     exists = true;
                     // creates a new "sub-tree" and traverse it to return all children and sub-children

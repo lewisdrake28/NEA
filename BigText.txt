@@ -1,243 +1,9 @@
-//////////////////
-// FINAL.csproj //
-//////////////////
-
-<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Terminal.Gui" Version="1.*" />
-  </ItemGroup>
-
-</Project>
-
-////////////////
-// Program.cs //
-////////////////
-
-// install dependencies
-// using FINAL;
-// using Terminal.Gui;
-// using BKTree;
-// using BloomFilter;
-// using DefineWords;
-// using Levenshtein;
-
-Application.Init();
-
-try
-{
-    string[] words = new string[2];
-    words[0] = "test";
-    words[1] = "this";
-
-    string[] words2 = new string[2];
-    words2[0] = "test";
-    words2[1] = "this";
-
-    Application.Run(new SpellCheck(words, words2));
-
-    // Application.Run(new Dictionary());
-}
-finally
-{
-    Application.Shutdown();
-}
-
-/////////////
-// Classes //
-/////////////
-
-///////////////////////
-// Classes/BKTree.cs //
-///////////////////////
-
-// install dependencies
-// using System.Collections;
-// using Levenshtein;
-
-// suppress warnings
-#pragma warning disable 
-
-namespace BKTree
-{
-
-    class BkTree
-    {
-        protected struct Connection
-        {
-            // node
-            public string word;
-            // edge to parent
-            public int weight;
-        }
-
-        protected static LevenshteinDistance leven = new LevenshteinDistance();
-        // each node has its own word, and a list of connections to store edge weights to children
-        protected static Dictionary<string, List<Connection>> tree = new Dictionary<string, List<Connection>>();
-        protected static string[] words = File.ReadAllLines("/Users/lewisdrake/Desktop/WordLists/V2/TrueWords.txt");
-        protected static int[] weights = new int[words.Length];
-        protected string root;
-
-        public BkTree(string root)
-        {
-            weights = leven.CalculateAll(root, words);
-
-            // create the tree where every word is a node
-            for (int a = 0; a < words.Length; a++)
-            {
-                if (tree.Count == 0)
-                {
-                    CreateRoot(root);
-                }
-                else
-                {
-                    if (root != tree.Keys.ElementAt(0))
-                    {
-                        AddNode(words, weights, a);
-                    }
-                }
-            }
-        }
-
-        protected void CreateRoot(string word)
-        {
-            Connection thisConnection = new Connection();
-            thisConnection.word = word;
-            // weight from root -> root = i (therefore 0)
-            thisConnection.weight = 0;
-
-            List<Connection> connections = new List<Connection>();
-            connections.Add(thisConnection);
-
-            tree.Add(word, connections);
-        }
-
-        public void AddNode(string[] words, int[] weights, int index)
-        {
-            Connection thisConnection = new Connection();
-            thisConnection.word = words[index];
-            thisConnection.weight = weights[index];
-
-            CreateNode(thisConnection.word, root, thisConnection.weight);
-        }
-
-        protected void CreateNode(string word, string parent, int weight)
-        {
-            // checks if an edge from the root node already exists with the same weight
-            // if it doesn't, then create node as nornmal from the root
-            // if it does, then use that node (that has the same weight) as the new parent
-            // due to the nature of BK-trees every edge from a parent must have a distinct weight
-            string? exists = CheckEdges(parent, weight);
-            if (exists != null)
-            {
-                // but weight from the parent might be different to the weight from the node, so recalculate
-                int newWeight = leven.Calculate(parent, word);
-                CreateNode(word, exists, newWeight);
-            }
-            else
-            {
-                Connection thisConnection = new Connection();
-                thisConnection.word = word;
-                thisConnection.weight = weight;
-
-                tree.Add(thisConnection.word, new List<Connection>());
-                tree[parent][tree[parent].Count] = thisConnection;
-            }
-        }
-
-        // search each edge from a specified parent to see if a particular weight already exists
-        protected string CheckEdges(string word, int weight)
-        {
-            List<int> edges = new List<int>();
-
-            for (int a = 0; a < tree[word].Count; a++)
-            {
-                edges.Add(tree[word][a].weight);
-            }
-
-            for (int a = 0; a < edges.Count; a++)
-            {
-                if (edges[a] == weight)
-                {
-                    return tree[word][a].word;
-                }
-            }
-
-            return null;
-        }
-
-        // input 1 when ReturnClosest is called in program
-        public List<string> ReturnClosest(int maxWeight)
-        {
-            List<string> words = new List<string>();
-            bool exists = false;
-
-            for (int a = 0; a < tree[root].Count; a++)
-            {
-                if (tree[root][a].weight == maxWeight)
-                {
-                    exists = true;
-                    // creates a new "sub-tree" and traverse it to return all children and sub-children
-                    words = BFS(tree[root][a].word);
-                }
-
-                // if the maxWeight doesn't exist from root
-                // then increase maxWeight and try again
-                // this will increase the allowed distance from root -> other words
-                if (!exists)
-                {
-                    maxWeight++;
-                    ReturnClosest(maxWeight);
-                }
-            }
-
-            return words;
-        }
-
-        // used as a traversal method rather than searching
-        protected List<string> BFS(string parent)
-        {
-            Queue queue = new Queue();
-            queue.Enqueue(parent);
-            List<string> words = new List<string>();
-            List<string> visited = new List<string>();
-            string word;
-
-            while (queue.Count != 0)
-            {
-                word = queue.Dequeue().ToString();
-                words.Add(word);
-                visited.Add(word);
-
-                for (int a = 0; a < tree[word].Count; a++)
-                {
-                    // if a node is unvisited, then add it to the queue to be vistsed soon
-                    if (visited.Contains(tree[word][a].word) == false)
-                    {
-                        queue.Enqueue(tree[word][a].word);
-                    }
-                }
-            }
-
-            return words;
-        }
-    }
-}
-
 ////////////////////////////
 // Classes/BloomFilter.cs //
 ////////////////////////////
 
 // install dependencies
-// using System.Text;
+using System.Text;
 
 // suppress warnings
 #pragma warning disable 
@@ -549,8 +315,8 @@ namespace BloomFilter
 ////////////////////////////
 
 // install dependencies
-// using System.Net;
-// using Newtonsoft.Json;
+using System.Net;
+using Newtonsoft.Json;
 
 // suppress warnings
 #pragma warning disable 
@@ -660,6 +426,214 @@ namespace DefineWords
     }
 }
 
+
+///////////////////////
+// Classes/BKTree.cs //
+///////////////////////
+
+// install dependencies
+using System.Collections;
+using Levenshtein;
+
+// suppress warnings
+#pragma warning disable 
+
+namespace BKTree
+{
+
+    class BkTree
+    {
+        protected struct Connection
+        {
+            // node
+            public string word;
+            // edge to parent
+            public int weight;
+        }
+
+        protected static LevenshteinDistance leven = new LevenshteinDistance();
+        // each node has its own word, and a list of connections to store edge weights to children
+        protected static Dictionary<string, List<Connection>> tree = new Dictionary<string, List<Connection>>();
+        protected static string[] words = File.ReadAllLines("/Users/lewisdrake/Desktop/WordLists/V2/TrueWords.txt");
+        protected static int[] weights = new int[words.Length];
+        protected string root;
+
+        public BkTree(string root)
+        {
+            weights = leven.CalculateAll(root, words);
+
+            // create the tree where every word is a node
+            for (int a = 0; a < words.Length; a++)
+            {
+                if (tree.Count == 0)
+                {
+                    CreateRoot(root);
+                }
+                else
+                {
+                    if (root != tree.Keys.ElementAt(0))
+                    {
+                        AddNode(words, weights, a);
+                    }
+                }
+            }
+        }
+
+        protected void CreateRoot(string word)
+        {
+            Connection thisConnection = new Connection();
+            thisConnection.word = word;
+            // weight from root -> root = i (therefore 0)
+            thisConnection.weight = 0;
+
+            List<Connection> connections = new List<Connection>();
+            connections.Add(thisConnection);
+
+            tree.Add(word, connections);
+        }
+
+        public void AddNode(string[] words, int[] weights, int index)
+        {
+            Connection thisConnection = new Connection();
+            thisConnection.word = words[index];
+            thisConnection.weight = weights[index];
+
+            CreateNode(thisConnection.word, root, thisConnection.weight);
+        }
+
+        protected void CreateNode(string word, string parent, int weight)
+        {
+            // checks if an edge from the root node already exists with the same weight
+            // if it doesn't, then create node as nornmal from the root
+            // if it does, then use that node (that has the same weight) as the new parent
+            // due to the nature of BK-trees every edge from a parent must have a distinct weight
+            string? exists = CheckEdges(parent, weight);
+            if (exists != null)
+            {
+                // but weight from the parent might be different to the weight from the node, so recalculate
+                int newWeight = leven.Calculate(parent, word);
+                CreateNode(word, exists, newWeight);
+            }
+            else
+            {
+                Connection thisConnection = new Connection();
+                thisConnection.word = word;
+                thisConnection.weight = weight;
+
+                tree.Add(thisConnection.word, new List<Connection>());
+                tree[parent][tree[parent].Count] = thisConnection;
+            }
+        }
+
+        // search each edge from a specified parent to see if a particular weight already exists
+        protected string CheckEdges(string word, int weight)
+        {
+            List<int> edges = new List<int>();
+
+            for (int a = 0; a < tree[word].Count; a++)
+            {
+                edges.Add(tree[word][a].weight);
+            }
+
+            for (int a = 0; a < edges.Count; a++)
+            {
+                if (edges[a] == weight)
+                {
+                    return tree[word][a].word;
+                }
+            }
+
+            return null;
+        }
+
+        // input 1 when ReturnClosest is called in program
+        public List<string> ReturnClosest(int maxWeight)
+        {
+            List<string> words = new List<string>();
+            bool exists = false;
+
+            for (int a = 0; a < tree[root].Count; a++)
+            {
+                if (tree[root][a].weight < maxWeight)
+                {
+                    exists = true;
+                    // creates a new "sub-tree" and traverse it to return all children and sub-children
+                    words = BFS(tree[root][a].word);
+                }
+
+                // if the maxWeight doesn't exist from root
+                // then increase maxWeight and try again
+                // this will increase the allowed distance from root -> other words
+                if (!exists)
+                {
+                    maxWeight++;
+                    ReturnClosest(maxWeight);
+                }
+            }
+
+            return words;
+        }
+
+        // used as a traversal method rather than searching
+        protected List<string> BFS(string parent)
+        {
+            Queue queue = new Queue();
+            queue.Enqueue(parent);
+            List<string> words = new List<string>();
+            List<string> visited = new List<string>();
+            string word;
+
+            while (queue.Count != 0)
+            {
+                word = queue.Dequeue().ToString();
+                words.Add(word);
+                visited.Add(word);
+
+                for (int a = 0; a < tree[word].Count; a++)
+                {
+                    // if a node is unvisited, then add it to the queue to be vistsed soon
+                    if (visited.Contains(tree[word][a].word) == false)
+                    {
+                        queue.Enqueue(tree[word][a].word);
+                    }
+                }
+            }
+
+            return words;
+        }
+    }
+}
+
+// // install dependencies
+// using System.Collections;
+
+// // suppress warnings
+// #pragma warning disable 
+
+// namespace BinarySearch
+// {
+//     class BinarySearch
+//     {
+//         protected int Search(string[] items, string target)
+//         {
+//             double left = 0;
+//             double right = items.Length - 1;
+//             double centre;
+
+//             while (left != right)
+//             {
+//                 centre = (left + right) / 2;
+//                 centre = Math.Ceiling(centre);
+
+//                 if (items[centre] > target)
+//                 {
+//                     right = centre - 1;
+//                 }
+//             }
+//         }
+//     }
+// }
+
 ////////////////////////////
 // Classes/Levenshtein.cs //
 ////////////////////////////
@@ -754,138 +728,13 @@ namespace Levenshtein
     }
 }
 
-////////////////////
-// View designers //
-////////////////////
-
-///////////////////////////////////////////
-// View designers/Dictionary.Designer.cs //
-///////////////////////////////////////////
-
-// install dependencies
-// using System;
-// using Terminal.Gui;
-// using NStack;
-// using System.Collections.Generic;
-
-namespace FINAL
-{
-    public partial class Dictionary : MasterView
-    {
-        protected Button lookupBtn = new Button();
-        protected Button nextBtn = new Button();
-        protected Button prevBtn = new Button();
-        protected Button defineBtn = new Button();
-        protected Button addBtn = new Button();
-        protected Button removeBtn = new Button();
-        protected Button filterBtn = new Button();
-
-        protected Label[] wordLabs = new Label[101988];
-
-        protected RadioGroup filterRad = new RadioGroup();
-
-        protected TextField lookupTxt = new TextField();
-
-        protected void InitializeComponent()
-        {
-            // build lookup elements 
-            lookupTxt.X = 50;
-            lookupTxt.Y = 4;
-            lookupTxt.Width = 14;
-
-            lookupBtn.Text = "Lookup";
-            lookupBtn.X = lookupTxt.X;
-            lookupBtn.Y = lookupTxt.Y + 2;
-
-            Add(lookupBtn, lookupTxt);
-
-            // build navigation elements
-            nextBtn.Text = "Next page";
-            nextBtn.X = 64;
-            nextBtn.Y = 21;
-
-            prevBtn.Text = "Prev page";
-            prevBtn.X = nextBtn.X - 14;
-            prevBtn.Y = nextBtn.Y;
-
-            Add(prevBtn, nextBtn);
-
-            // build functional buttons
-            defineBtn.X = lookupTxt.X;
-            defineBtn.Y = lookupBtn.Y + 2;
-            defineBtn.Text = "Define word";
-
-            addBtn.X = lookupTxt.X;
-            addBtn.Y = defineBtn.Y + 2;
-            addBtn.Text = "Add word";
-
-            removeBtn.X = lookupTxt.X;
-            removeBtn.Y = addBtn.Y + 2;
-            removeBtn.Text = "Remove word";
-
-            Add(defineBtn, addBtn, removeBtn);
-
-            // build fitering elements
-            filterRad.X = lookupTxt.X;
-            filterRad.Y = removeBtn.Y + 2;
-            filterRad.RadioLabels = new ustring[] { "All words", "Default words", "Added words" };
-
-            filterBtn.X = lookupTxt.X;
-            filterBtn.Y = filterRad.Y + 4;
-            filterBtn.Text = "Filter list";
-
-            Add(filterRad, filterBtn);
-        }
-    }
-}
-
-/////////////////////////////////////////
-// View designers/MainView.Designer.cs //
-/////////////////////////////////////////
-
-// install dependencies
-// using System;
-// using Terminal.Gui;
-
-namespace FINAL
-{
-    public partial class MainView : MasterView
-    {
-        protected Button settingsBtn = new Button();
-        protected Button spellBtn = new Button();
-
-        protected TextView textEntry = new TextView();
-
-        protected void InitializeComponent()
-        {
-            textEntry.X = 1;
-            textEntry.Y = 2;
-            textEntry.Width = 76;
-            textEntry.Height = 5;
-            textEntry.WordWrap = true;
-
-            Add(textEntry);
-
-            settingsBtn.Text = "Settings";
-            settingsBtn.X = 1;
-            settingsBtn.Y = 20;
-
-            spellBtn.Text = "Spell check";
-            spellBtn.X = settingsBtn.X + 13;
-            spellBtn.Y = settingsBtn.Y;
-
-            Add(settingsBtn, spellBtn);
-        }
-    }
-}
-
 ///////////////////////////////////////////
 // View designers/MasterView.Designer.cs //
 ///////////////////////////////////////////
 
 // install dependencies
-// using System;
-// using Terminal.Gui;
+using System;
+using Terminal.Gui;
 
 namespace FINAL
 {
@@ -908,15 +757,16 @@ namespace FINAL
     }
 }
 
+
 /////////////////////////////////////////
 // View designers/Settings.Designer.cs //
 /////////////////////////////////////////
 
 // install dependencies
-// using System;
-// using Terminal.Gui;
-// using System.IO;
-// using NStack;
+using System;
+using Terminal.Gui;
+using System.IO;
+using NStack;
 
 namespace FINAL
 {
@@ -1005,32 +855,150 @@ namespace FINAL
     }
 }
 
-/////////////////////////////////////////////
-// View designers/SkeletonView.Designer.cs //
-/////////////////////////////////////////////
+// spell check - check box
+// view dictionary - button that links to new view 
+// max length - int text field 
+// change acronyms - check box 
+// grammar check - check box - EXTENSTION
+// save settings - button
+
+
+/////////////////////////////////////////
+// View designers/MainView.Designer.cs //
+/////////////////////////////////////////
 
 // install dependencies
-// using System;
-// using Terminal.Gui;
+using System;
+using Terminal.Gui;
 
 namespace FINAL
 {
-    public partial class SkeletonView : MasterView
+    public partial class MainView : MasterView
     {
+        protected Button settingsBtn = new Button();
+        protected Button spellBtn = new Button();
+
+        protected TextView textEntry = new TextView();
+
         protected void InitializeComponent()
         {
+            textEntry.X = 1;
+            textEntry.Y = 2;
+            textEntry.Width = 76;
+            textEntry.Height = 5;
+            textEntry.WordWrap = true;
 
+            Add(textEntry);
+
+            settingsBtn.Text = "Settings";
+            settingsBtn.X = 1;
+            settingsBtn.Y = 20;
+
+            spellBtn.Text = "Spell check";
+            spellBtn.X = settingsBtn.X + 13;
+            spellBtn.Y = settingsBtn.Y;
+
+            Add(settingsBtn, spellBtn);
         }
     }
 }
 
+
+///////////////////////////////////////////
+// View designers/Dictionary.Designer.cs //
+///////////////////////////////////////////
+
+// install dependencies
+using System;
+using Terminal.Gui;
+using NStack;
+using System.Collections.Generic;
+
+namespace FINAL
+{
+    public partial class Dictionary : MasterView
+    {
+        protected Button lookupBtn = new Button();
+        protected Button nextBtn = new Button();
+        protected Button prevBtn = new Button();
+        protected Button defineBtn = new Button();
+        protected Button addBtn = new Button();
+        protected Button removeBtn = new Button();
+        protected Button filterBtn = new Button();
+
+        protected Label[] wordLabs = new Label[101988];
+
+        protected RadioGroup filterRad = new RadioGroup();
+
+        protected TextField lookupTxt = new TextField();
+
+        protected void InitializeComponent()
+        {
+            // build lookup elements 
+            lookupTxt.X = 50;
+            lookupTxt.Y = 4;
+            lookupTxt.Width = 14;
+
+            lookupBtn.Text = "Lookup";
+            lookupBtn.X = lookupTxt.X;
+            lookupBtn.Y = lookupTxt.Y + 2;
+
+            Add(lookupBtn, lookupTxt);
+
+            // build navigation elements
+            nextBtn.Text = "Next page";
+            nextBtn.X = 64;
+            nextBtn.Y = 21;
+
+            prevBtn.Text = "Prev page";
+            prevBtn.X = nextBtn.X - 14;
+            prevBtn.Y = nextBtn.Y;
+
+            Add(prevBtn, nextBtn);
+
+            // build functional buttons
+            defineBtn.X = lookupTxt.X;
+            defineBtn.Y = lookupBtn.Y + 2;
+            defineBtn.Text = "Define word";
+
+            addBtn.X = lookupTxt.X;
+            addBtn.Y = defineBtn.Y + 2;
+            addBtn.Text = "Add word";
+
+            removeBtn.X = lookupTxt.X;
+            removeBtn.Y = addBtn.Y + 2;
+            removeBtn.Text = "Remove word";
+
+            Add(defineBtn, addBtn, removeBtn);
+
+            // build fitering elements
+            filterRad.X = lookupTxt.X;
+            filterRad.Y = removeBtn.Y + 2;
+            filterRad.RadioLabels = new ustring[] { "All words", "Default words", "Added words" };
+
+            filterBtn.X = lookupTxt.X;
+            filterBtn.Y = filterRad.Y + 4;
+            filterBtn.Text = "Filter list";
+
+            Add(filterRad, filterBtn);
+        }
+    }
+}
+
+// sorted a-z √
+// filter by words added by user x
+// seach, and add if not present √
+// define words √
+// remove words √
+
 ////////////////////////////////////////////
 // View designers/SkeletonView.Designer.cs //
 ////////////////////////////////////////////
 
 // install dependencies
-// using System;
-// using Terminal.Gui;
+using System;
+using Terminal.Gui;
+using BKTree;
 
 namespace FINAL
 {
@@ -1040,6 +1008,7 @@ namespace FINAL
         protected Button ignoreBtn = new Button();
         protected Button userBtn = new Button();
         protected Button acronymBtn = new Button();
+        protected Button bktree = new Button();
 
         protected Label lookupLab = new Label();
         protected Label lookupLab2 = new Label();
@@ -1066,7 +1035,7 @@ namespace FINAL
             lookupLab3.Text = "enter, then handle error";
 
             lookupTxt.X = lookupLab.X;
-            lookupTxt.Y = lookupLab3.Y + 2; ;
+            lookupTxt.Y = lookupLab3.Y + 2;;
             lookupTxt.Width = 14;
 
             lookupBtn.X = lookupLab.X;
@@ -1103,24 +1072,252 @@ namespace FINAL
             acronymBtn.Text = "Replace acronyms";
 
             Add(acronymBtn);
+
+            bktree.X = Pos.Center();
+            bktree.Y = Pos.Center();
+            bktree.Text = "BK-Tree";
+            Add(bktree);
         }
     }
 }
 
-///////////
-// Views //
-///////////
+// ingore the error √
+// button
+// remove from the false words list
+//
+// DOING THIS !
+// change the error to a user specified word x
+// label, text field, button
+// have another text field and button that user can enter word into
+// change the word in the text to the new one
+// and remove from the false words list
+//
+// change the error to one recommended by bk-tree x
+// button, query box
+// open a query box when a button is pressed
+// query will have multiple buttons (if possible) each being a word suggestion
+// if not possible, then a new view (like the dictionary) will be called. but will use buttons instead of labels
+// and remove from the false words list
+//
+// change acronyms x
+// button
+// check the text for all acronyms and change them to the fully expanded version
+
+/////////////////////////////////////////////
+// View designers/SkeletonView.Designer.cs //
+/////////////////////////////////////////////
+
+// // install dependencies
+// using System;
+// using Terminal.Gui;
+
+// namespace FINAL
+// {
+//     public partial class SkeletonView : MasterView
+//     {
+//         protected void InitializeComponent()
+//         {
+
+//         }
+//     }
+// }
+
+
+/////////////////////////
+// Views/SpellCheck.cs //
+/////////////////////////
+
+// install dependencies
+using Terminal.Gui;
+
+namespace FINAL
+{
+
+    public partial class SpellCheck
+    {
+        protected int firstIndex;
+
+        protected string? error;
+        protected List<string> falseWords = new List<string>();
+        protected List<string> words = new List<string>();
+
+        public SpellCheck(string[] flaseWordsIn, string[] wordsIn)
+        {
+            falseWords = flaseWordsIn.ToList();
+            words = wordsIn.ToList();
+
+            DisplayWords();
+
+            InitializeComponent();
+
+            lookupBtn.Clicked += () => { error = lookupTxt.Text.ToString(); };
+
+            ignoreBtn.Clicked += () =>
+            {
+                error = lookupTxt.Text.ToString();
+
+                if (error != null)
+                {
+                    falseWords.Remove(error);
+
+                    DisplayWords();
+
+                    MessageBox.Query("Ignored", error + " has been ignored as an error", "Ok");
+                }
+            };
+
+            acronymBtn.Clicked += () => { ReaplceAcronyms(); };
+
+            bktree.Clicked += () =>
+            {
+                BKTree.BkTree tree = new BKTree.BkTree("this");
+                List<string> words = tree.ReturnClosest(1);
+                string text = "";
+
+                for (int a = 0; a < words.Count; a++)
+                {
+                    text += words[a] + "\n";
+                }
+
+                MessageBox.Query(words.Count.ToString(), text, "OK");
+            };
+        }
+
+        protected void DisplayWords()
+        {
+            int xPos = 2;
+            int yPos = 2;
+            int thisIndex = firstIndex;
+
+            foreach (var a in wordLabs)
+            {
+                Remove(a);
+            }
+            wordLabs.Clear();
+
+            for (int a = 0; a < 41; a++)
+            {
+                if (thisIndex < falseWords.Count)
+                {
+                    wordLabs.Add(new Label());
+                    wordLabs[a] = new Label();
+                    wordLabs[a].X = xPos;
+                    wordLabs[a].Y = yPos;
+                    wordLabs[a].Text = falseWords[thisIndex];
+
+                    Add(wordLabs[a]);
+
+                    yPos++;
+                    thisIndex++;
+                }
+
+                if (yPos == 22)
+                {
+                    xPos = 30;
+                    yPos = 2;
+                }
+            }
+        }
+
+        protected void ReaplceAcronyms()
+        {
+            string path = "Resources/Acronyms.txt";
+            string[] acronyms = File.ReadAllLines(path);
+            string[] shortAcr = new string[acronyms.Length];
+            string[] fullAcr = new string[acronyms.Length];
+
+            for (int a = 0; a < acronyms.Length; a++)
+            {
+                int starIndex = acronyms[a].IndexOf('*');
+                shortAcr[a] = acronyms[a].Substring(0, starIndex - 1);
+                fullAcr[a] = acronyms[a].Substring(starIndex + 1);
+            }
+
+            for (int a = 0; a < words.Count; a++)
+            {
+                for (int b = 0; b < acronyms.Length; b++)
+                {
+                    if (words[a] == shortAcr[b])
+                    {
+                        words[a] = fullAcr[b];
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+///////////////////////////
+// Views/SkeletonView.cs //
+///////////////////////////
+
+// install dependencies
+// using Terminal.Gui;
+
+// namespace FINAL
+// {
+
+//     public partial class SkeletonView
+//     {
+//         public SkeletonView()
+//         {
+//             InitializeComponent();
+//         }
+//     }
+// }
+
+
+///////////////////////
+// Views/MainView.cs //
+///////////////////////
+
+// install dependencies
+using Terminal.Gui;
+using BloomFilter;
+
+namespace FINAL
+{
+
+    public partial class MainView
+    {
+        public MainView()
+        {
+            InitializeComponent();
+
+            settingsBtn.Clicked += () => Application.Run(new Settings());
+            spellBtn.Clicked += () => CheckSpelling();
+        }
+
+        protected void CheckSpelling()
+        {
+            BloomFilter.BloomFilter bloom = new BloomFilter.BloomFilter();
+            string text = textEntry.Text.ToString()!;
+            string[] words = text.Split(' ');
+            List<string> falseWords = new List<string>();
+
+            for (int a = 0; a < words.Length; a++)
+            {
+                if (!bloom.Lookup(words[a]))
+                {
+                    falseWords.Add(words[a]);
+                }
+            }
+        }
+    }
+}
+
 
 /////////////////////////
 // Views/Dictionary.cs //
 /////////////////////////
 
 // install dependencies
-// using Terminal.Gui;
-// using System.IO;
-// using System.Collections.Generic;
-// using DefineWords;
-// using System.Linq;
+using Terminal.Gui;
+using System.IO;
+using System.Collections.Generic;
+using DefineWords;
+using System.Linq;
 
 namespace FINAL
 {
@@ -1406,51 +1603,13 @@ namespace FINAL
     }
 }
 
-///////////////////////
-// Views/MainView.cs //
-///////////////////////
-
-// install dependencies
-// using Terminal.Gui;
-// using BloomFilter;
-
-namespace FINAL
-{
-
-    public partial class MainView
-    {
-        public MainView()
-        {
-            InitializeComponent();
-
-            settingsBtn.Clicked += () => Application.Run(new Settings());
-            spellBtn.Clicked += () => CheckSpelling();
-        }
-
-        protected void CheckSpelling()
-        {
-            BloomFilter.BloomFilter bloom = new BloomFilter.BloomFilter();
-            string text = textEntry.Text.ToString()!;
-            string[] words = text.Split(' ');
-            List<string> falseWords = new List<string>();
-
-            for (int a = 0; a < words.Length; a++)
-            {
-                if (!bloom.Lookup(words[a]))
-                {
-                    falseWords.Add(words[a]);
-                }
-            }
-        }
-    }
-}
 
 /////////////////////////
 // Views/MasterView.cs //
 /////////////////////////
 
 // install dependencies
-// using Terminal.Gui;
+using Terminal.Gui;
 
 namespace FINAL
 {
@@ -1464,13 +1623,14 @@ namespace FINAL
     }
 }
 
+
 ///////////////////////
 // Views/Settings.cs //
 ///////////////////////
 
 // install dependencies
-// using Terminal.Gui;
-// using System.IO;
+using Terminal.Gui;
+using System.IO;
 
 namespace FINAL
 {
@@ -1530,131 +1690,4 @@ namespace FINAL
     }
 }
 
-///////////////////////////
-// Views/SkeletonView.cs //
-///////////////////////////
 
-// install dependencies
-// using Terminal.Gui;
-
-namespace FINAL
-{
-
-    public partial class SkeletonView
-    {
-        public SkeletonView()
-        {
-            InitializeComponent();
-        }
-    }
-}
-
-/////////////////////////
-// Views/SpellCheck.cs //
-/////////////////////////
-
-// install dependencies
-// using Terminal.Gui;
-
-namespace FINAL
-{
-
-    public partial class SpellCheck
-    {
-        protected int firstIndex;
-
-        protected string? error;
-        protected List<string> falseWords = new List<string>();
-        protected List<string> words = new List<string>();
-
-        public SpellCheck(string[] flaseWordsIn, string[] wordsIn)
-        {
-            falseWords = flaseWordsIn.ToList();
-            words = wordsIn.ToList();
-
-            DisplayWords();
-
-            InitializeComponent();
-
-            lookupBtn.Clicked += () => { error = lookupTxt.Text.ToString(); };
-
-            ignoreBtn.Clicked += () =>
-            {
-                error = lookupTxt.Text.ToString();
-
-                if (error != null)
-                {
-                    falseWords.Remove(error);
-
-                    DisplayWords();
-
-                    MessageBox.Query("Ignored", error + " has been ignored as an error", "Ok");
-                }
-            };
-
-            acronymBtn.Clicked += () => { ReaplceAcronyms(); };
-        }
-
-        protected void DisplayWords()
-        {
-            int xPos = 2;
-            int yPos = 2;
-            int thisIndex = firstIndex;
-
-            foreach (var a in wordLabs)
-            {
-                Remove(a);
-            }
-            wordLabs.Clear();
-
-            for (int a = 0; a < 41; a++)
-            {
-                if (thisIndex < falseWords.Count)
-                {
-                    wordLabs.Add(new Label());
-                    wordLabs[a] = new Label();
-                    wordLabs[a].X = xPos;
-                    wordLabs[a].Y = yPos;
-                    wordLabs[a].Text = falseWords[thisIndex];
-
-                    Add(wordLabs[a]);
-
-                    yPos++;
-                    thisIndex++;
-                }
-
-                if (yPos == 22)
-                {
-                    xPos = 30;
-                    yPos = 2;
-                }
-            }
-        }
-
-        protected void ReaplceAcronyms()
-        {
-            string path = "Resources/Acronyms.txt";
-            string[] acronyms = File.ReadAllLines(path);
-            string[] shortAcr = new string[acronyms.Length];
-            string[] fullAcr = new string[acronyms.Length];
-
-            for (int a = 0; a < acronyms.Length; a++)
-            {
-                int starIndex = acronyms[a].IndexOf('*');
-                shortAcr[a] = acronyms[a].Substring(0, starIndex - 1);
-                fullAcr[a] = acronyms[a].Substring(starIndex + 1);
-            }
-
-            for (int a = 0; a < words.Count; a++)
-            {
-                for (int b = 0; b < acronyms.Length; b++)
-                {
-                    if (words[a] == shortAcr[b])
-                    {
-                        words[a] = fullAcr[b];
-                    }
-                }
-            }
-        }
-    }
-}
