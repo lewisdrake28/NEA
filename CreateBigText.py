@@ -13,6 +13,8 @@ def GetData(path, bigText):
             f.close()
 
             bigText = bigText + "\n" + "\n"
+
+    print(bigText);
             
     return bigText
 
@@ -25,3 +27,4 @@ bigText = GetData("/Users/lewisdrake/NEA/FINAL/Views", bigText)
 f = open("/Users/lewisdrake/NEA/BigText.txt", "w")
 f.write(bigText)
 f.close()
+

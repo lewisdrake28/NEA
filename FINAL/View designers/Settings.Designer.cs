@@ -15,13 +15,14 @@ namespace FINAL
         protected Button viewDictBtn = new Button();
         protected Button saveBtn = new Button();
         protected Button homeBtn = new Button();
+        protected Button resetBtn = new Button();
 
         protected CheckBox spellCheckCbx = new CheckBox();
         protected CheckBox changeAcronymsCbx = new CheckBox();
         protected CheckBox grammarCheckCbx = new CheckBox();
 
-        protected ColorPicker bckgdPck = new ColorPicker();
-        protected ColorPicker textPck = new ColorPicker();
+        protected ColorPicker backgroundPick = new ColorPicker();
+        protected ColorPicker foregroundPick = new ColorPicker();
 
         protected Label spellCheckLab = new Label();
         protected Label viewDictLab = new Label();
@@ -42,7 +43,7 @@ namespace FINAL
             viewDictLab.X = spellCheckLab.X;
             viewDictLab.Y = spellCheckLab.Y + 2;
 
-            maxLengthLab.Text = "Maximum length";
+            maxLengthLab.Text = "Maximum length                For no max length, enter \"0\"";
             maxLengthLab.X = spellCheckLab.X;
             maxLengthLab.Y = viewDictLab.Y + 2;
 
@@ -85,7 +86,11 @@ namespace FINAL
             homeBtn.X = maxLengthLab.X;
             homeBtn.Y = saveBtn.Y + 2;
 
-            Add(viewDictBtn, saveBtn, homeBtn);
+            resetBtn.X = homeBtn.X + 10;
+            resetBtn.Y = homeBtn.Y;
+            resetBtn.Text = "Reset to default settings";
+
+            Add(viewDictBtn, saveBtn, homeBtn, resetBtn);
 
             // build text fields
             maxLengthTxt.X = spellCheckCbx.X;
@@ -96,26 +101,17 @@ namespace FINAL
             Add(maxLengthTxt);
 
             // build color elements
-            bckgdPck.X = maxLengthLab.X;
-            bckgdPck.Y = homeBtn.Y + 2;
-            bckgdPck.Text = "Background colour";
-            // bckgdPck.SelectedColor = Colors.ColorSchemes[""];
-            bckgdPck.ColorScheme
+            backgroundPick.X = maxLengthLab.X;
+            backgroundPick.Y = homeBtn.Y + 2;
+            backgroundPick.Text = "Background colour";
+            backgroundPick.SelectedColor = background;
 
-            textPck.X = 40;
-            textPck.Y = bckgdPck.Y;
-            textPck.Text = "Text colour";
+            foregroundPick.X = 38;
+            foregroundPick.Y = backgroundPick.Y;
+            foregroundPick.Text = "Foreground colour";
+            foregroundPick.SelectedColor = foreground;
 
-            Add(bckgdPck, textPck);
+            Add(backgroundPick, foregroundPick);
         }
     }
 }
-
-// spell check - check box √
-// view dictionary - button that links to new view √
-// max length - int text field √
-// change acronyms - check box √
-// grammar check - check box - EXTENSTION x
-// font colour x
-// font size x
-// save settings - button √

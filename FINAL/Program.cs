@@ -26,6 +26,8 @@ try
 
     // Application.Run(new Dictionary());
 
+    Settings thisSettings = new Settings();
+
     Application.Run(new Settings());
 }
 finally

@@ -15,6 +15,8 @@ namespace FINAL
         public int maxLength;
         public bool changeAcronyms;
         public bool grammarCheck;
+        public Color background;
+        public Color foreground;
 
         public Settings()
         {
@@ -24,7 +26,8 @@ namespace FINAL
 
             saveBtn.Clicked += () => { SaveSettings(); };
             viewDictBtn.Clicked += () => { Application.Run(new Dictionary()); };
-            saveBtn.Clicked += () => { Application.Run(new MainView()); };
+            homeBtn.Clicked += () => { Application.Run(new MainView()); };
+            resetBtn.Clicked += () => { ResetSettings(); };
         }
 
         protected void SaveSettings()
@@ -44,17 +47,18 @@ namespace FINAL
                 + "Lengt " + maxLength + "\n"
                 + "Acron " + changeAcronyms + "\n"
                 + "Grama " + grammarCheck + "\n"
-                + "TextC"
-                + "Backg"
+                + "Foreg " + foregroundPick.SelectedColor + "\n"
+                + "Backg " + backgroundPick.SelectedColor + "\n"
                 ;
 
             string path = "Resources/Settings.txt";
             File.WriteAllText(path, settings);
 
+            FetchSettings();
             MessageBox.Query("Saved", "Settings saved successfully", "Ok");
         }
 
-        protected void FetchSettings()
+        public void FetchSettings()
         {
             string path = "Resources/Settings.txt";
             string[] settings = File.ReadAllLines(path);
@@ -63,6 +67,75 @@ namespace FINAL
             maxLength = int.Parse(settings[1].Substring(6));
             changeAcronyms = bool.Parse(settings[2].Substring(6));
             grammarCheck = bool.Parse(settings[3].Substring(6));
+            foreground = GetColour(settings[4].Substring(6));
+            background = GetColour(settings[5].Substring(6));
+
+            Colors.Base.Normal = Application.Driver.MakeAttribute(foreground, background);
+        }
+
+        protected void ResetSettings()
+        {
+            spellCheck = true;
+            maxLength = 0;
+            changeAcronyms = true;
+            grammarCheck = false;
+            foreground = Color.Gray;
+            background = Color.Blue;
+
+            string settings = "Spell " + spellCheck + "\n"
+                + "Lengt " + maxLength + "\n"
+                + "Acron " + changeAcronyms + "\n"
+                + "Grama " + grammarCheck + "\n"
+                + "Foreg " + foreground + "\n"
+                + "Backg " + background + "\n"
+                ;
+
+            string path = "Resources/Settings.txt";
+            File.WriteAllText(path, settings);
+
+            FetchSettings();
+            MessageBox.Query("Reset", "Settings reset to default successfully", "Ok");
+        }
+
+        protected Color GetColour(string colourStr)
+        {
+            switch (colourStr)
+            {
+                case "Black":
+                    return Color.Black;
+                case "Blue":
+                    return Color.Blue;
+                case "BrightBlue":
+                    return Color.BrightBlue;
+                case "BrightCyan":
+                    return Color.BrightCyan;
+                case "BrightGreen":
+                    return Color.BrightGreen;
+                case "BrightMagenta":
+                    return Color.BrightMagenta;
+                case "BrightRed":
+                    return Color.BrightRed;
+                case "BrightYellow":
+                    return Color.BrightYellow;
+                case "Brown":
+                    return Color.Brown;
+                case "Cyan":
+                    return Color.Cyan;
+                case "DarkGray":
+                    return Color.DarkGray;
+                case "Gray":
+                    return Color.Gray;
+                case "Green":
+                    return Color.Green;
+                case "Magenta":
+                    return Color.Magenta;
+                case "Red":
+                    return Color.Red;
+                case "White":
+                    return Color.White;
+            }
+
+            return Color.Black;
         }
     }
 }
