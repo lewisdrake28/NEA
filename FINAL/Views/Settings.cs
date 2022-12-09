@@ -43,7 +43,10 @@ namespace FINAL
             string settings = "Spell " + spellCheck + "\n"
                 + "Lengt " + maxLength + "\n"
                 + "Acron " + changeAcronyms + "\n"
-                + "Grama " + grammarCheck + "\n";
+                + "Grama " + grammarCheck + "\n"
+                + "TextC"
+                + "Backg"
+                ;
 
             string path = "Resources/Settings.txt";
             File.WriteAllText(path, settings);

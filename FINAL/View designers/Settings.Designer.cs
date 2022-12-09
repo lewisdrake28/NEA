@@ -20,6 +20,9 @@ namespace FINAL
         protected CheckBox changeAcronymsCbx = new CheckBox();
         protected CheckBox grammarCheckCbx = new CheckBox();
 
+        protected ColorPicker bckgdPck = new ColorPicker();
+        protected ColorPicker textPck = new ColorPicker();
+
         protected Label spellCheckLab = new Label();
         protected Label viewDictLab = new Label();
         protected Label maxLengthLab = new Label();
@@ -91,13 +94,28 @@ namespace FINAL
             maxLengthTxt.Text = maxLength.ToString();
 
             Add(maxLengthTxt);
+
+            // build color elements
+            bckgdPck.X = maxLengthLab.X;
+            bckgdPck.Y = homeBtn.Y + 2;
+            bckgdPck.Text = "Background colour";
+            // bckgdPck.SelectedColor = Colors.ColorSchemes[""];
+            bckgdPck.ColorScheme
+
+            textPck.X = 40;
+            textPck.Y = bckgdPck.Y;
+            textPck.Text = "Text colour";
+
+            Add(bckgdPck, textPck);
         }
     }
 }
 
-// spell check - check box
-// view dictionary - button that links to new view 
-// max length - int text field 
-// change acronyms - check box 
-// grammar check - check box - EXTENSTION
-// save settings - button
+// spell check - check box √
+// view dictionary - button that links to new view √
+// max length - int text field √
+// change acronyms - check box √
+// grammar check - check box - EXTENSTION x
+// font colour x
+// font size x
+// save settings - button √
