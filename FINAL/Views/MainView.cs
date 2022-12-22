@@ -15,8 +15,8 @@ namespace FINAL
         {
             InitializeComponent();
 
-            settingsBtn.Clicked += () => Application.Run(new Settings());
-            spellBtn.Clicked += () => CheckSpelling();
+            settingsBtn.Clicked += () => { Application.Run(new Settings()); };
+            spellBtn.Clicked += () => { CheckSpelling(); };
         }
 
         protected void CheckSpelling()

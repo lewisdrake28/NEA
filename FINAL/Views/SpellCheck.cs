@@ -45,13 +45,20 @@ namespace FINAL
 
             bktree.Clicked += () =>
             {
-                BKTree.BkTree tree = new BKTree.BkTree("this");
+                // string word = lookupTxt.Text.ToString();
+
+                BKTree.BkTree tree = new BKTree.BkTree(error);
                 List<string> words = tree.ReturnClosest(1);
                 string text = "";
 
-                for (int a = 0; a < words.Count; a++)
+                // for (int a = 0; a < words.Count; a++)
+                // {
+                //     text += words[a] + "\n";
+                // }
+
+                foreach(var word in words)
                 {
-                    text += words[a] + "\n";
+                    text += word + "\n";
                 }
 
                 MessageBox.Query(words.Count.ToString(), text, "OK");

@@ -14,21 +14,19 @@ Application.Init();
 
 try
 {
-    // string[] words = new string[2];
-    // words[0] = "test";
-    // words[1] = "this";
-
-    // string[] words2 = new string[2];
-    // words2[0] = "test";
-    // words2[1] = "this";
-
-    // Application.Run(new SpellCheck(words, words2));
-
-    // Application.Run(new Dictionary());
-
     Settings thisSettings = new Settings();
 
-    Application.Run(new Settings());
+    string[] falseWords = new string[3];
+    falseWords[0] = "this";
+    falseWords[1] = "is";
+    falseWords[2] = "a";
+
+    string[] words = new string[3];
+    words[0] = "test";
+    words[1] = "do";
+    words[2] = "you";
+
+    Application.Run(new SpellCheck(falseWords, words));
 }
 finally
 {
