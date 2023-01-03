@@ -81,7 +81,6 @@ namespace FINAL
                 }
             };
 
-            // filterBtn.Clicked += () => MessageBox.Query("title", filterRad.SelectedItem.ToString(), "Ok"); //FilterList(filterRad.SelectedItem); 
             filterBtn.Clicked += () =>
             {
                 currentFilter = filterRad.SelectedItem;

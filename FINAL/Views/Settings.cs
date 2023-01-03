@@ -26,7 +26,6 @@ namespace FINAL
 
             saveBtn.Clicked += () => { SaveSettings(); };
             viewDictBtn.Clicked += () => { Application.Run(new Dictionary()); };
-            homeBtn.Clicked += () => { Application.Run(new MainView()); };
             resetBtn.Clicked += () => { ResetSettings(); };
         }
 

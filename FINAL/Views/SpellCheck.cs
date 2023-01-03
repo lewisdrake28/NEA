@@ -4,6 +4,7 @@
 
 // install dependencies
 using Terminal.Gui;
+using BKTree;
 
 namespace FINAL
 {
@@ -45,23 +46,21 @@ namespace FINAL
 
             bktree.Clicked += () =>
             {
-                // string word = lookupTxt.Text.ToString();
+                error = lookupTxt.Text.ToString();
 
-                BKTree.BkTree tree = new BKTree.BkTree(error);
-                List<string> words = tree.ReturnClosest(1);
-                string text = "";
-
-                // for (int a = 0; a < words.Count; a++)
-                // {
-                //     text += words[a] + "\n";
-                // }
-
-                foreach(var word in words)
+                if (error != null)
                 {
-                    text += word + "\n";
-                }
+                    BKTree.BkTree tree = new BKTree.BkTree(error);
+                    List<Connection> words = tree.ReturnClosest(1);
+                    string text = "";
 
-                MessageBox.Query(words.Count.ToString(), text, "OK");
+                    foreach (var word in words)
+                    {
+                        text += word.word + "   ";
+                    }
+
+                    MessageBox.Query(words.Count.ToString(), text, "OK");
+                }
             };
         }
 

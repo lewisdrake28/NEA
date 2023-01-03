@@ -436,42 +436,44 @@ using System.Collections;
 using Levenshtein;
 
 // suppress warnings
-#pragma warning disable 
+#pragma warning disable
 
 namespace BKTree
 {
+    public struct Connection
+    {
+        // node
+        public string word;
+        // edge to parent
+        public int weight;
+    }
 
     class BkTree
     {
-        protected struct Connection
-        {
-            // node
-            public string word;
-            // edge to parent
-            public int weight;
-        }
-
         protected static LevenshteinDistance leven = new LevenshteinDistance();
         // each node has its own word, and a list of connections to store edge weights to children
-        protected static Dictionary<string, List<Connection>> tree = new Dictionary<string, List<Connection>>();
+        public static Dictionary<string, List<Connection>> tree = new Dictionary<string, List<Connection>>();
         protected static string[] words = File.ReadAllLines("/Users/lewisdrake/Desktop/WordLists/V2/TrueWords.txt");
         protected static int[] weights = new int[words.Length];
         protected string root;
+        protected List<string> visitedWords = new List<string>();
 
-        public BkTree(string root)
+        public BkTree(string rootIn)
         {
-            weights = leven.CalculateAll(root, words);
+            root = rootIn;
+
+            weights = leven.CalculateAll(rootIn, words);
 
             // create the tree where every word is a node
             for (int a = 0; a < words.Length; a++)
             {
                 if (tree.Count == 0)
                 {
-                    CreateRoot(root);
+                    CreateRoot(rootIn);
                 }
                 else
                 {
-                    if (root != tree.Keys.ElementAt(0))
+                    if (words[a] != root)
                     {
                         AddNode(words, weights, a);
                     }
@@ -521,7 +523,7 @@ namespace BKTree
                 thisConnection.weight = weight;
 
                 tree.Add(thisConnection.word, new List<Connection>());
-                tree[parent][tree[parent].Count] = thisConnection;
+                tree[parent].Add(thisConnection);
             }
         }
 
@@ -546,60 +548,63 @@ namespace BKTree
             return null;
         }
 
-        // input 1 when ReturnClosest is called in program
-        public List<string> ReturnClosest(int maxWeight)
+        public void ClearTree()
         {
-            List<string> words = new List<string>();
-            bool exists = false;
-
-            for (int a = 0; a < tree[root].Count; a++)
+            for (int a = 0; a < tree.Count; a++)
             {
-                if (tree[root][a].weight < maxWeight)
+                tree.Remove(words[a]);
+            }
+
+            tree.Clear();
+        }
+
+        // input 1 when ReturnClosest is called in program
+        public List<Connection> ReturnClosest(int maxWeight)
+        {
+            // used as a dummy to store the index of last word used as parent
+            Connection dummyConnection = new Connection();
+            dummyConnection.word = "";
+            dummyConnection.weight = 0;
+
+            string parent = FindParent(maxWeight);
+            List<Connection> closeWords = tree[parent];
+
+            while (closeWords.Count < 10)
+            {
+                if (!(dummyConnection.weight < closeWords.Count))
                 {
-                    exists = true;
-                    // creates a new "sub-tree" and traverse it to return all children and sub-children
-                    words = BFS(tree[root][a].word);
+                    break;
                 }
 
-                // if the maxWeight doesn't exist from root
-                // then increase maxWeight and try again
-                // this will increase the allowed distance from root -> other words
+                parent = closeWords[dummyConnection.weight].word;
+                closeWords.AddRange(tree[parent]);
+                dummyConnection.weight++;
+            }
+
+            return closeWords;
+        }
+
+        protected string FindParent(int maxWeight)
+        {
+            bool exists = false;
+
+            while (!exists)
+            {
+                for (int a = 0; a < tree[root].Count; a++)
+                {
+                    if (tree[root][a].weight < maxWeight && tree[root][a].word != root)
+                    {
+                        return tree[root][a].word;
+                    }
+                }
+
                 if (!exists)
                 {
                     maxWeight++;
-                    ReturnClosest(maxWeight);
                 }
             }
 
-            return words;
-        }
-
-        // used as a traversal method rather than searching
-        protected List<string> BFS(string parent)
-        {
-            Queue queue = new Queue();
-            queue.Enqueue(parent);
-            List<string> words = new List<string>();
-            List<string> visited = new List<string>();
-            string word;
-
-            while (queue.Count != 0)
-            {
-                word = queue.Dequeue().ToString();
-                words.Add(word);
-                visited.Add(word);
-
-                for (int a = 0; a < tree[word].Count; a++)
-                {
-                    // if a node is unvisited, then add it to the queue to be vistsed soon
-                    if (visited.Contains(tree[word][a].word) == false)
-                    {
-                        queue.Enqueue(tree[word][a].word);
-                    }
-                }
-            }
-
-            return words;
+            return null;
         }
     }
 }
@@ -876,15 +881,6 @@ namespace FINAL
     }
 }
 
-// spell check - check box √
-// view dictionary - button that links to new view √
-// max length - int text field √
-// change acronyms - check box √
-// grammar check - check box - EXTENSTION √
-// font colour √
-// font size x
-// save settings - button √
-
 
 /////////////////////////////////////////
 // View designers/MainView.Designer.cs //
@@ -893,6 +889,7 @@ namespace FINAL
 // install dependencies
 using System;
 using Terminal.Gui;
+using System.Collections.Generic;
 
 namespace FINAL
 {
@@ -1152,6 +1149,7 @@ namespace FINAL
 
 // install dependencies
 using Terminal.Gui;
+using BKTree;
 
 namespace FINAL
 {
@@ -1193,21 +1191,28 @@ namespace FINAL
 
             bktree.Clicked += () =>
             {
-                BKTree.BkTree tree = new BKTree.BkTree("this");
-                List<string> words = tree.ReturnClosest(1);
-                string text = "";
+                error = lookupTxt.Text.ToString();
 
-                for (int a = 0; a < words.Count; a++)
+                if (error != null)
                 {
-                    text += words[a] + "\n";
-                }
+                    BKTree.BkTree tree = new BKTree.BkTree(error);
+                    List<Connection> words = tree.ReturnClosest(1);
+                    string text = "";
 
-                MessageBox.Query(words.Count.ToString(), text, "OK");
+                    foreach (var word in words)
+                    {
+                        text += word.word + "   ";
+                    }
+
+                    MessageBox.Query(words.Count.ToString(), text, "OK");
+                }
             };
         }
 
         protected void DisplayWords()
         {
+
+
             int xPos = 2;
             int yPos = 2;
             int thisIndex = firstIndex;
@@ -1308,8 +1313,8 @@ namespace FINAL
         {
             InitializeComponent();
 
-            settingsBtn.Clicked += () => Application.Run(new Settings());
-            spellBtn.Clicked += () => CheckSpelling();
+            settingsBtn.Clicked += () => { Application.Run(new Settings()); };
+            spellBtn.Clicked += () => { CheckSpelling(); };
         }
 
         protected void CheckSpelling()

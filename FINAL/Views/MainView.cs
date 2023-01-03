@@ -15,7 +15,6 @@ namespace FINAL
         {
             InitializeComponent();
 
-            settingsBtn.Clicked += () => { Application.Run(new Settings()); };
             spellBtn.Clicked += () => { CheckSpelling(); };
         }
 
@@ -33,6 +32,10 @@ namespace FINAL
                     falseWords.Add(words[a]);
                 }
             }
+
+            string[] falseWordsArr = falseWords.ToArray();
+
+            Application.Run(new SpellCheck(falseWordsArr, words));
         }
     }
 }

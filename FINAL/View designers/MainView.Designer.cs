@@ -11,7 +11,6 @@ namespace FINAL
 {
     public partial class MainView : MasterView
     {
-        protected Button settingsBtn = new Button();
         protected Button spellBtn = new Button();
 
         protected TextView textEntry = new TextView();
@@ -26,15 +25,11 @@ namespace FINAL
 
             Add(textEntry);
 
-            settingsBtn.Text = "Settings";
-            settingsBtn.X = 1;
-            settingsBtn.Y = 20;
-
             spellBtn.Text = "Spell check";
-            spellBtn.X = settingsBtn.X + 13;
-            spellBtn.Y = settingsBtn.Y;
+            spellBtn.X = 1;
+            spellBtn.Y = 20;
 
-            Add(settingsBtn, spellBtn);
+            Add(spellBtn);
         }
     }
 }

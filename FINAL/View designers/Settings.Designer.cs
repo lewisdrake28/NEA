@@ -14,7 +14,6 @@ namespace FINAL
     {
         protected Button viewDictBtn = new Button();
         protected Button saveBtn = new Button();
-        protected Button homeBtn = new Button();
         protected Button resetBtn = new Button();
 
         protected CheckBox spellCheckCbx = new CheckBox();
@@ -82,15 +81,11 @@ namespace FINAL
             saveBtn.Y = grammarCheckLab.Y + 2;
             saveBtn.IsDefault = true;
 
-            homeBtn.Text = "Home";
-            homeBtn.X = maxLengthLab.X;
-            homeBtn.Y = saveBtn.Y + 2;
-
-            resetBtn.X = homeBtn.X + 10;
-            resetBtn.Y = homeBtn.Y;
+            resetBtn.X = maxLengthLab.X;
+            resetBtn.Y = saveBtn.Y + 2;
             resetBtn.Text = "Reset to default settings";
 
-            Add(viewDictBtn, saveBtn, homeBtn, resetBtn);
+            Add(viewDictBtn, saveBtn, resetBtn);
 
             // build text fields
             maxLengthTxt.X = spellCheckCbx.X;
@@ -102,7 +97,7 @@ namespace FINAL
 
             // build color elements
             backgroundPick.X = maxLengthLab.X;
-            backgroundPick.Y = homeBtn.Y + 2;
+            backgroundPick.Y = resetBtn.Y + 2;
             backgroundPick.Text = "Background colour";
             backgroundPick.SelectedColor = background;
 
