@@ -218,6 +218,7 @@ namespace BloomFilter
             }
 
             int d = word.Length & 7;
+            d %= word.Length;
             int e = (d - 1) * 8;
             if (e < 0)
             {

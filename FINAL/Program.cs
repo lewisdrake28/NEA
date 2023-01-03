@@ -16,17 +16,19 @@ try
 {
     Settings thisSettings = new Settings();
 
-    string[] falseWords = new string[3];
-    falseWords[0] = "this";
-    falseWords[1] = "is";
-    falseWords[2] = "a";
+    // string[] falseWords = new string[3];
+    // falseWords[0] = "this";
+    // falseWords[1] = "is";
+    // falseWords[2] = "you";
 
-    string[] words = new string[3];
-    words[0] = "test";
-    words[1] = "do";
-    words[2] = "you";
+    // string[] words = new string[3];
+    // words[0] = "test";
+    // words[1] = "do";
+    // words[2] = "you";
 
-    Application.Run(new SpellCheck(falseWords, words));
+    // Application.Run(new SpellCheck(falseWords, words));
+
+    Application.Run(new MainView());
 }
 finally
 {
