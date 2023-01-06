@@ -10,7 +10,7 @@ namespace FINAL
 {
     public partial class MasterView : Window
     {
-        protected void Build()
+        public void Build()
         {
             Title = "Spell Checker " + this;
 
@@ -18,15 +18,13 @@ namespace FINAL
                 new MenuBarItem("_File", new MenuItem[] {
                     new MenuItem("_Quit", "", () => {
                         Application.Shutdown();
-                    })
-                }),
-
-                new MenuBarItem("_Go", new MenuItem[] {
+                    }),
+                    
                     new MenuItem("_Settings", "", () => {
                         Application.Run(new Settings());
                     }),
 
-                    new MenuItem("_Spell Check", "", () => {
+                    new MenuItem("_Main View", "", () => {
                         Application.Run(new MainView());
                     }),
 

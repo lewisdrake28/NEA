@@ -8,13 +8,12 @@ def GetData(path, bigText):
         
         if (filename.endswith(".cs")):
             fullPath = path + "/" + filename
+            print(fullPath)
             f = open(fullPath, "r")
             bigText = bigText + f.read()
             f.close()
 
             bigText = bigText + "\n" + "\n"
-
-    print(bigText);
             
     return bigText
 
@@ -28,3 +27,4 @@ f = open("/Users/lewisdrake/NEA/BigText.txt", "w")
 f.write(bigText)
 f.close()
 
+print(bigText)

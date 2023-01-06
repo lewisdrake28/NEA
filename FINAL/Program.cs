@@ -28,7 +28,12 @@ try
 
     // Application.Run(new SpellCheck(falseWords, words));
 
-    Application.Run(new MainView());
+
+    // Application.Run(new MainView());
+
+
+    string text = "thjis is a tezt";
+    Application.Run(new SpellCheck(text));
 }
 finally
 {

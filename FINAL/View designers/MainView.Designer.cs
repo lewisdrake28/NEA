@@ -12,6 +12,7 @@ namespace FINAL
     public partial class MainView : MasterView
     {
         protected Button spellBtn = new Button();
+        protected Button clearBtn = new Button();
 
         protected TextView textEntry = new TextView();
 
@@ -29,7 +30,11 @@ namespace FINAL
             spellBtn.X = 1;
             spellBtn.Y = 20;
 
-            Add(spellBtn);
+            clearBtn.Text = "Clear text";
+            clearBtn.X = spellBtn.X + spellBtn.Text.Length + 6;
+            clearBtn.Y = spellBtn.Y;
+
+            Add(spellBtn, clearBtn);
         }
     }
 }

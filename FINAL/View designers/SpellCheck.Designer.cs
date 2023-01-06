@@ -15,7 +15,9 @@ namespace FINAL
         protected Button ignoreBtn = new Button();
         protected Button userBtn = new Button();
         protected Button acronymBtn = new Button();
-        protected Button bktree = new Button();
+        protected Button HomeBtn = new Button();
+        protected Button HomeBtn2 = new Button();
+        protected Button replaceBtn = new Button();
 
         protected Label lookupLab = new Label();
         protected Label lookupLab2 = new Label();
@@ -29,61 +31,67 @@ namespace FINAL
         protected void InitializeComponent()
         {
             // build lookup elements
+            lookupLab.Text = "Enter word from left side";
             lookupLab.X = 50;
             lookupLab.Y = 2;
-            lookupLab.Text = "Enter word from left side";
 
+            lookupLab2.Text = "in the field below. Press";
             lookupLab2.X = lookupLab.X;
             lookupLab2.Y = lookupLab.Y + 1;
-            lookupLab2.Text = "in the field below. Press";
 
+            lookupLab3.Text = "enter, then handle error";
             lookupLab3.X = lookupLab.X;
             lookupLab3.Y = lookupLab2.Y + 1;
-            lookupLab3.Text = "enter, then handle error";
 
             lookupTxt.X = lookupLab.X;
-            lookupTxt.Y = lookupLab3.Y + 2;;
+            lookupTxt.Y = lookupLab3.Y + 1;
             lookupTxt.Width = 14;
 
+            lookupBtn.Text = "Enter";
             lookupBtn.X = lookupLab.X;
             lookupBtn.Y = lookupTxt.Y + 2;
-            lookupBtn.Text = "Enter";
 
             Add(lookupLab, lookupLab2, lookupLab3, lookupTxt, lookupTxt, lookupBtn);
 
-            // build ignore error elements
+            // 
             ignoreBtn.X = lookupLab.X;
             ignoreBtn.Y = lookupBtn.Y + 2;
             ignoreBtn.Text = "Ignore error";
 
             Add(ignoreBtn);
 
-            // build change error to user word elements
+            // build change error elements
+            userLab.Text = "Enter new word";
             userLab.X = lookupLab.X;
             userLab.Y = ignoreBtn.Y + 2;
-            userLab.Text = "Enter new word";
 
             userTxt.X = lookupLab.X;
-            userTxt.Y = userLab.Y + 2;
+            userTxt.Y = userLab.Y + 1;
             userTxt.Width = 14;
 
+            userBtn.Text = "Replace";
             userBtn.X = lookupLab.X;
             userBtn.Y = userTxt.Y + 2;
-            userBtn.Text = "Replace";
 
-            Add(userLab, userTxt, userBtn);
+            replaceBtn.Text = "Recommend words";
+            replaceBtn.X = lookupLab.X;
+            replaceBtn.Y = userBtn.Y + 2;
 
-            // build replace acronyms elements 
-            acronymBtn.X = lookupLab.X;
-            acronymBtn.Y = userBtn.Y + 2;
+            Add(userLab, userTxt, userBtn, replaceBtn);
+
+            // 
             acronymBtn.Text = "Replace acronyms";
+            acronymBtn.X = lookupLab.X;
+            acronymBtn.Y = replaceBtn.Y + 2;
 
             Add(acronymBtn);
 
-            bktree.X = Pos.Center();
-            bktree.Y = Pos.Center();
-            bktree.Text = "BK-Tree";
-            Add(bktree);
+            // 
+            HomeBtn.Text = "Home";
+            HomeBtn.X = lookupLab.X;
+            HomeBtn.Y = acronymBtn.Y + 2;
+
+            Add(HomeBtn);
         }
     }
 }

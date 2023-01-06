@@ -13,29 +13,40 @@ namespace FINAL
     {
         public MainView()
         {
-            InitializeComponent();
-
-            spellBtn.Clicked += () => { CheckSpelling(); };
+            BuildAll();
         }
 
-        protected void CheckSpelling()
+        // used when coming from the spell check view
+        // so the text field will have all the corrected words 
+        public MainView(string text)
         {
-            BloomFilter.BloomFilter bloom = new BloomFilter.BloomFilter();
-            string text = textEntry.Text.ToString()!;
-            string[] words = text.Split(' ');
-            List<string> falseWords = new List<string>();
+            BuildAll();
 
-            for (int a = 0; a < words.Length; a++)
+            textEntry.Text = text;
+        }
+
+        public void BuildAll()
+        {
+            InitializeComponent();
+
+            spellBtn.Clicked += () =>
             {
-                if (!bloom.Lookup(words[a]))
+                string text = textEntry.Text.ToString();
+
+                if (text is null)
                 {
-                    falseWords.Add(words[a]);
+                    MessageBox.Query("Spell check complete", "No incorrect words", "OK");
                 }
-            }
+                else
+                {
+                    Application.Run(new SpellCheck(text));
+                }
+            };
 
-            string[] falseWordsArr = falseWords.ToArray();
-
-            Application.Run(new SpellCheck(falseWordsArr, words));
+            clearBtn.Clicked += () =>
+            {
+                textEntry.Text = "";
+            };
         }
     }
 }

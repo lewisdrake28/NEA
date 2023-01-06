@@ -31,6 +31,8 @@ namespace BKTree
 
         public BkTree(string rootIn)
         {
+            tree.Clear();
+
             root = rootIn;
 
             weights = leven.CalculateAll(rootIn, words);
@@ -93,8 +95,11 @@ namespace BKTree
                 thisConnection.word = word;
                 thisConnection.weight = weight;
 
-                tree.Add(thisConnection.word, new List<Connection>());
-                tree[parent].Add(thisConnection);
+                if (!tree.ContainsKey(thisConnection.word))
+                {
+                    tree.Add(thisConnection.word, new List<Connection>());
+                    tree[parent].Add(thisConnection);
+                }
             }
         }
 
@@ -130,7 +135,8 @@ namespace BKTree
         }
 
         // input 1 when ReturnClosest is called in program
-        public List<Connection> ReturnClosest(int maxWeight)
+        // public List<string> ReturnClosest(int maxWeight)
+        public string[] ReturnClosest(int maxWeight)
         {
             // used as a dummy to store the index of last word used as parent
             Connection dummyConnection = new Connection();
@@ -140,7 +146,7 @@ namespace BKTree
             string parent = FindParent(maxWeight);
             List<Connection> closeWords = tree[parent];
 
-            while (closeWords.Count < 10)
+            while (closeWords.Count < 15)
             {
                 if (!(dummyConnection.weight < closeWords.Count))
                 {
@@ -152,7 +158,14 @@ namespace BKTree
                 dummyConnection.weight++;
             }
 
-            return closeWords;
+            string[] wordsOut = new string[closeWords.Count];
+
+            for (int a = 0; a < closeWords.Count; a++)
+            {
+                wordsOut[a] = closeWords[a].word;
+            }
+
+            return wordsOut;
         }
 
         protected string FindParent(int maxWeight)
