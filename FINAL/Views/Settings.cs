@@ -4,17 +4,20 @@
 
 // install dependencies
 using Terminal.Gui;
-using System.IO;
 
-namespace FINAL
+// suppress warnings
+# pragma warning disable
+
+namespace Views
 {
-
     public partial class Settings
     {
         public bool spellCheck;
-        public int maxLength;
         public bool changeAcronyms;
         public bool grammarCheck;
+
+        public int maxLength;
+
         public Color background;
         public Color foreground;
 
@@ -24,9 +27,18 @@ namespace FINAL
 
             InitializeComponent();
 
-            saveBtn.Clicked += () => { SaveSettings(); };
-            viewDictBtn.Clicked += () => { Application.Run(new Dictionary()); };
-            resetBtn.Clicked += () => { ResetSettings(); };
+            saveBtn.Clicked += () =>
+            {
+                SaveSettings();
+            };
+            viewDictBtn.Clicked += () =>
+            {
+                Application.Run(new Dictionary());
+            };
+            resetBtn.Clicked += () =>
+            {
+                ResetSettings();
+            };
         }
 
         protected void SaveSettings()

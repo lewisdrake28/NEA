@@ -3,12 +3,12 @@
 /////////////////////////////////////////
 
 // install dependencies
-using System;
 using Terminal.Gui;
-using System.IO;
-using NStack;
 
-namespace FINAL
+// suppress warnings
+# pragma warning disable
+
+namespace Views
 {
     public partial class Settings : MasterView
     {

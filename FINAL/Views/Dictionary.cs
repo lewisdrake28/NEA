@@ -4,23 +4,21 @@
 
 // install dependencies
 using Terminal.Gui;
-using System.IO;
-using System.Collections.Generic;
-using DefineWords;
-using System.Linq;
 
-namespace FINAL
+// suppress warnings
+# pragma warning disable
+
+namespace Views
 {
-
     public partial class Dictionary
     {
         public string[] words;
         protected string? currentLookup;
+        protected List<string> toDisplay = new List<string>();
 
         protected int firstIndex;
         protected int currentFilter;
 
-        protected List<string> toDisplay = new List<string>();
 
         public Dictionary()
         {
@@ -32,17 +30,26 @@ namespace FINAL
 
             InitializeComponent();
 
-            lookupBtn.Clicked += () => { Lookup(0); };
+            lookupBtn.Clicked += () =>
+            {
+                Lookup(0);
+            };
 
-            nextBtn.Clicked += () => { NextPage(); };
+            nextBtn.Clicked += () =>
+            {
+                NextPage();
+            };
 
-            prevBtn.Clicked += () => { PrevPage(); };
+            prevBtn.Clicked += () =>
+            {
+                PrevPage();
+            };
 
             defineBtn.Clicked += () =>
             {
                 currentLookup = lookupTxt.Text.ToString();
 
-                if (currentLookup != null)
+                if (currentLookup is not null)
                 {
                     DefineThis(currentLookup);
                 }
@@ -56,7 +63,7 @@ namespace FINAL
             {
                 currentLookup = lookupTxt.Text.ToString();
 
-                if (currentLookup != null && !currentLookup.Contains(" "))
+                if (currentLookup is not null && !currentLookup.Contains(" "))
                 {
                     AddThis(currentLookup);
                     UpdateWords();
@@ -70,7 +77,7 @@ namespace FINAL
             removeBtn.Clicked += () =>
             {
                 currentLookup = lookupTxt.Text.ToString();
-                if (currentLookup != null)
+                if (currentLookup is not null)
                 {
                     RemoveThis(currentLookup);
                     UpdateWords();
@@ -122,7 +129,7 @@ namespace FINAL
         protected void NextPage()
         {
             firstIndex += 20;
-            if ((toDisplay == null && firstIndex > words.Length) || (toDisplay != null && firstIndex > toDisplay.Count))
+            if ((toDisplay is null && firstIndex > words.Length) || (toDisplay is not null && firstIndex > toDisplay.Count))
             {
                 firstIndex -= 20;
             }
@@ -165,7 +172,7 @@ namespace FINAL
             }
             toDisplay.Clear();
 
-            if (currentLookup == null)
+            if (currentLookup is null)
             {
                 toDisplay = words.ToList();
             }

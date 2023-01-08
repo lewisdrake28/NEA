@@ -3,10 +3,12 @@
 ///////////////////////////////////////////
 
 // install dependencies
-using System;
 using Terminal.Gui;
 
-namespace FINAL
+// suppress warnings
+# pragma warning disable
+
+namespace Views
 {
     public partial class MasterView : Window
     {

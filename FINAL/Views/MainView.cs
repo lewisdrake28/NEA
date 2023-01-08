@@ -4,13 +4,16 @@
 
 // install dependencies
 using Terminal.Gui;
-using BloomFilter;
 
-namespace FINAL
+// suppress warnings
+# pragma warning disable
+
+namespace Views
 {
-
     public partial class MainView
     {
+        protected int length = 0;
+
         public MainView()
         {
             BuildAll();

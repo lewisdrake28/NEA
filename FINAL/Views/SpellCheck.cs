@@ -4,15 +4,15 @@
 
 // install dependencies
 using Terminal.Gui;
-using BKTree;
-using BloomFilter;
+using Utilities;
 using System.Text.RegularExpressions;
 using NStack;
-using System.Linq;
 
-namespace FINAL
+// suppress warnings
+# pragma warning disable
+
+namespace Views
 {
-
     public partial class SpellCheck
     {
         protected int firstIndex;
@@ -21,6 +21,8 @@ namespace FINAL
         protected List<string> falseWords = new List<string>();
         protected List<string> words = new List<string>();
         protected List<string> ignoredWords = new List<string>();
+
+        protected Settings theseSettings = new Settings();
 
         public SpellCheck(string textIn)
         {
@@ -40,11 +42,6 @@ namespace FINAL
                 LeaveMessage();
             }
 
-            lookupBtn.Clicked += () =>
-            {
-                error = lookupTxt.Text.ToString();
-            };
-
             ignoreBtn.Clicked += () =>
             {
                 error = lookupTxt.Text.ToString();
@@ -61,35 +58,26 @@ namespace FINAL
 
             acronymBtn.Clicked += () =>
             {
-                ReaplceAcronyms();
+                Settings theseSettings = new Settings();
 
-                MessageBox.Query("Acronyms replaced", "All acronyms have been replaced", "Ok");
+                if (theseSettings.changeAcronyms)
+                {
+                    ReaplceAcronyms();
 
-                DisplayWords();
+                    MessageBox.Query("Acronyms replaced", "All acronyms have been replaced", "Ok");
+
+                    DisplayWords();
+                }
             };
 
             HomeBtn.Clicked += () =>
             {
-                string text = "";
-
-                foreach (var a in words)
-                {
-                    text += a + " ";
-                }
-
-                Application.Run(new MainView(text));
+                GoHome();
             };
 
             HomeBtn2.Clicked += () =>
             {
-                string text = "";
-
-                foreach (var a in words)
-                {
-                    text += a + " ";
-                }
-
-                Application.Run(new MainView(text));
+                GoHome();
             };
 
             userBtn.Clicked += () =>
@@ -162,11 +150,34 @@ namespace FINAL
 
                 DisplayWords();
             };
+
+            addBtn.Clicked += () =>
+            {
+                error = lookupTxt.Text.ToString();
+
+                using (StreamWriter writer = new StreamWriter("Resources/AddedWords.txt"))
+                {
+                    writer.Write(error + "\n");
+                }
+
+                MessageBox.Query("Spelling learnt", "The spelling of " + error + " has been learnt", "Ok");
+
+                DisplayWords();
+            };
+
+            resizeBtn.Clicked += () =>
+            {
+                ResizeText();
+
+                MessageBox.Query("Text resized", "Text has been resized to " + theseSettings.maxLength, "Ok");
+
+                DisplayWords();
+            };
         }
 
         protected void CheckSpelling()
         {
-            BloomFilter.BloomFilter bloom = new BloomFilter.BloomFilter();
+            Utilities.BloomFilter bloom = new Utilities.BloomFilter();
             falseWords.Clear();
 
             // check all words in the bloom filter 
@@ -180,7 +191,6 @@ namespace FINAL
                     }
                 }
             }
-
 
             if (falseWords.Count != 0)
             {
@@ -300,8 +310,11 @@ namespace FINAL
             // move any special characters to own index
             CheckGrammar();
             // find false words 
-            CheckSpelling();
-            CheckGrammar();
+            if (theseSettings.spellCheck)
+            {
+                CheckSpelling();
+                CheckGrammar();
+            }
 
             if (falseWords.Count == 0)
             {
@@ -384,6 +397,131 @@ namespace FINAL
                 falseWords[index] = newWord;
                 words[index] = newWord;
             }
+        }
+
+        protected void ResizeText()
+        {
+            string text = "";
+
+            foreach (var a in words)
+            {
+                text += a + " ";
+            }
+
+            if (theseSettings.maxLength != 0)
+            {
+                text = text.Substring(0, theseSettings.maxLength);
+            }
+
+            words = text.Split(' ').ToList();
+        }
+
+        protected void GoHome()
+        {
+            string text = "";
+
+            foreach (var a in words)
+            {
+                text += a + " ";
+            }
+
+            text = FixGrammar(text);
+
+            Application.Run(new MainView(text));
+        }
+
+        protected string FixGrammar(string text)
+        {
+            int speechCount = 0;
+
+            for (int a = 0; a < text.Length; a++)
+            {
+                switch (text[a])
+                {
+                    // need character before and space after
+                    case '.':
+                    case ',':
+                    case '!':
+                    case '?':
+                    case ':':
+                    case ';':
+                    case ')':
+
+                        // before
+                        if (a != 0)
+                        {
+                            if (char.IsWhiteSpace(text[a - 1]))
+                            {
+                                text = text.Remove(a - 1, 1);
+                            }
+                        }
+
+                        // after
+                        if (a != text.Length - 1)
+                        {
+                            if (!char.IsWhiteSpace(text[a + 1]))
+                            {
+                                string tempText = text.Substring(a + 1);
+                                text = text.Substring(0, a + 1);
+                                text += " ";
+                                text += tempText;
+                            }
+                        }
+
+                        break;
+
+                    // need character before and after 
+                    case '/':
+
+                        // before
+                        if (a != 0)
+                        {
+                            if (char.IsWhiteSpace(text[a - 1]))
+                            {
+                                text = text.Remove(a - 1, 1);
+                            }
+                        }
+
+                        // after 
+                        if (a != text.Length - 1)
+                        {
+                            if (char.IsWhiteSpace(text[a]))
+                            {
+                                text = text.Remove(a, 1);
+                            }
+                        }
+
+                        break;
+
+                    // need space before and character after
+                    case '(':
+
+                        // before 
+                        if (a != 0)
+                        {
+                            if (char.IsWhiteSpace(text[a - 1]))
+                            {
+                                string tempText = text.Substring(a);
+                                text = text.Substring(0, a - 1);
+                                text += " ";
+                                text += tempText;
+                            }
+                        }
+
+                        // after 
+                        if (a != text.Length - 1)
+                        {
+                            if (char.IsWhiteSpace(text[a + 1]))
+                            {
+                                text = text.Remove(a + 1, 1);
+                            }
+                        }
+
+                        break;
+                }
+            }
+
+            return text;
         }
     }
 }

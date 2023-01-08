@@ -3,21 +3,25 @@
 /////////////////////////////////////////
 
 // install dependencies
-using System;
 using Terminal.Gui;
-using System.Collections.Generic;
 
-namespace FINAL
+// suppress warnings
+# pragma warning disable
+
+namespace Views
 {
     public partial class MainView : MasterView
     {
         protected Button spellBtn = new Button();
         protected Button clearBtn = new Button();
 
+        protected Label lengthLab = new Label();
+
         protected TextView textEntry = new TextView();
 
         protected void InitializeComponent()
         {
+            //
             textEntry.X = 1;
             textEntry.Y = 2;
             textEntry.Width = 76;
@@ -26,6 +30,7 @@ namespace FINAL
 
             Add(textEntry);
 
+            //
             spellBtn.Text = "Spell check";
             spellBtn.X = 1;
             spellBtn.Y = 20;

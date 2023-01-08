@@ -3,12 +3,13 @@
 ///////////////////////////////////////////
 
 // install dependencies
-using System;
 using Terminal.Gui;
 using NStack;
-using System.Collections.Generic;
 
-namespace FINAL
+// suppress warnings
+# pragma warning disable
+
+namespace Views
 {
     public partial class Dictionary : MasterView
     {
@@ -78,9 +79,3 @@ namespace FINAL
         }
     }
 }
-
-// sorted a-z √
-// filter by words added by user x
-// seach, and add if not present √
-// define words √
-// remove words √
