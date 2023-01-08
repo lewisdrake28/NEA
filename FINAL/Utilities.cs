@@ -218,7 +218,7 @@ namespace Utilities
         // write the filter to a text file
         public void SetUp()
         {
-            string[] words = File.ReadAllLines("/Users/lewisdrake/NEA/Resources/WordLists/TrueWords.txt");
+            string[] words = File.ReadAllLines("Resources/TrueWords.txt");
 
             foreach (var a in words)
             {
@@ -231,8 +231,7 @@ namespace Utilities
         // write the filter to a text file
         protected void WriteFilter()
         {
-            //string filename = "Resources/Filter.txt";
-            string filename = "/Users/lewisdrake/NEA/Resources/Filter.txt";
+            string filename = "Resources/Filter.txt";
             string[] stringArray = filter.Select(x => x.ToString()).ToArray();
             string result = String.Concat(stringArray);
 
@@ -244,8 +243,7 @@ namespace Utilities
         // read the filter from a text file and store as an int array
         public BloomFilter()
         {
-            // change filename to the <filter>.txt 
-            string filename = "/Users/lewisdrake/NEA/Resources/Filter.txt";
+            string filename = "Resources/Filter.txt";
             string text = File.ReadAllText(filename);
 
             for (uint a = 0; a < filter.Length; a++)

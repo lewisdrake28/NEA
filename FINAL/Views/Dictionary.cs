@@ -263,7 +263,7 @@ namespace Views
 
         protected void RemoveThis(string word)
         {
-            string path = "/Users/lewisdrake/NEA/FINAL/Resources/AddedWords.txt";
+            string path = "Resources/AddedWords.txt";
             string[] words = File.ReadAllLines(path);
 
             if (words.Contains(word))
