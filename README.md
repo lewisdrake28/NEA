@@ -7,4 +7,4 @@ Levenshtein distance - complete
 
 BK-tree - complete 
 
-UI - incomplete(!!) (needs commenting)
+UI - complete
