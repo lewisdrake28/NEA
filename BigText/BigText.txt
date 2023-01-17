@@ -34,6 +34,7 @@ using Newtonsoft.Json;
 namespace Utilities
 {
     
+    
     ////////////
     // BKTree //
     ////////////
@@ -218,7 +219,7 @@ namespace Utilities
 
     class BloomFilter
     {
-        protected int[] filter = new int[5365948];
+        protected int[] filter = new int[2682975];
 
         // FIRST TIME USE
         // 
@@ -239,7 +240,7 @@ namespace Utilities
         // write the filter to a text file
         public void SetUp()
         {
-            string[] words = File.ReadAllLines("/Users/lewisdrake/NEA/Resources/WordLists/TrueWords.txt");
+            string[] words = File.ReadAllLines("Resources/TrueWords.txt");
 
             foreach (var a in words)
             {
@@ -252,8 +253,7 @@ namespace Utilities
         // write the filter to a text file
         protected void WriteFilter()
         {
-            //string filename = "Resources/Filter.txt";
-            string filename = "/Users/lewisdrake/NEA/Resources/Filter.txt";
+            string filename = "Resources/Filter.txt";
             string[] stringArray = filter.Select(x => x.ToString()).ToArray();
             string result = String.Concat(stringArray);
 
@@ -265,8 +265,7 @@ namespace Utilities
         // read the filter from a text file and store as an int array
         public BloomFilter()
         {
-            // change filename to the <filter>.txt 
-            string filename = "/Users/lewisdrake/NEA/Resources/Filter.txt";
+            string filename = "Resources/Filter.txt";
             string text = File.ReadAllText(filename);
 
             for (uint a = 0; a < filter.Length; a++)
@@ -353,9 +352,6 @@ namespace Utilities
 
             foreach (var a in bytes)
             {
-                // index = (hash ^ a) % (uint)nums.Length;
-                // hash = nums[index];
-
                 hash = nums[((hash ^ a) % (uint)nums.Length)];
             }
 
@@ -385,9 +381,6 @@ namespace Utilities
 
             foreach (var a in bytes)
             {
-                // hash *= 16777619;
-                // hash ^= a;
-
                 hash = (hash * 16777619) ^ a;
             }
 
@@ -764,7 +757,7 @@ namespace DefineWords
 }
 
 
-/////////////////
+﻿////////////////
 // Program.cs //
 ////////////////
 
@@ -850,6 +843,7 @@ namespace Views
         protected Button viewDictBtn = new Button();
         protected Button saveBtn = new Button();
         protected Button resetBtn = new Button();
+        protected Button acronymBtn = new Button();
 
         protected CheckBox spellCheckCbx = new CheckBox();
         protected CheckBox changeAcronymsCbx = new CheckBox();
@@ -863,8 +857,12 @@ namespace Views
         protected Label maxLengthLab = new Label();
         protected Label changeAcryonymsLab = new Label();
         protected Label grammarCheckLab = new Label();
+        protected Label shortAcrLab = new Label();
+        protected Label fullAcrLab = new Label();
 
         protected TextField maxLengthTxt = new TextField();
+        protected TextField shortAcrTxt = new TextField();
+        protected TextField fullAcrTxt = new TextField();
 
         protected void InitializeComponent()
         {
@@ -942,6 +940,29 @@ namespace Views
             foregroundPick.SelectedColor = foreground;
 
             Add(backgroundPick, foregroundPick);
+
+            // build acronym elements
+            shortAcrTxt.X = foregroundPick.X;
+            shortAcrTxt.Y = grammarCheckLab.Y;
+            shortAcrTxt.Width = 8;
+
+            shortAcrLab.X = shortAcrTxt.X + 9;
+            shortAcrLab.Y = shortAcrTxt.Y;
+            shortAcrLab.Text = "Short acronym";
+
+            fullAcrTxt.X = shortAcrTxt.X;
+            fullAcrTxt.Y = shortAcrTxt.Y + 2;
+            fullAcrTxt.Width = 8;
+
+            fullAcrLab.X = shortAcrLab.X;
+            fullAcrLab.Y = fullAcrTxt.Y;
+            fullAcrLab.Text = "Full acronym";
+
+            acronymBtn.X = shortAcrTxt.X;
+            acronymBtn.Y = fullAcrTxt.Y + 2;
+            acronymBtn.Text = "Add acronym";
+
+            Add(shortAcrTxt, shortAcrLab, fullAcrTxt, fullAcrLab, acronymBtn);
         }
     }
 }
@@ -974,7 +995,7 @@ namespace Views
             textEntry.X = 1;
             textEntry.Y = 2;
             textEntry.Width = 76;
-            textEntry.Height = 5;
+            textEntry.Height = 15;
             textEntry.WordWrap = true;
 
             Add(textEntry);
@@ -1077,9 +1098,9 @@ namespace Views
 }
 
 
-/////////////////////////////////////////////
-// View designers/SkeletonView.Designer.cs //
-/////////////////////////////////////////////
+///////////////////////////////////////////
+// View designers/SpellCheck.Designer.cs //
+///////////////////////////////////////////
 
 // install dependencies
 using Terminal.Gui;
@@ -1094,8 +1115,8 @@ namespace Views
         protected Button ignoreBtn = new Button();
         protected Button userBtn = new Button();
         protected Button acronymBtn = new Button();
-        protected Button HomeBtn = new Button();
-        protected Button HomeBtn2 = new Button();
+        protected Button homeBtn = new Button();
+        protected Button homeBtn2 = new Button();
         protected Button replaceBtn = new Button();
         protected Button addBtn = new Button();
         protected Button resizeBtn = new Button();
@@ -1178,11 +1199,11 @@ namespace Views
             Add(addBtn);
 
             // 
-            HomeBtn.Text = "Home";
-            HomeBtn.X = lookupLab.X;
-            HomeBtn.Y = addBtn.Y + 2;
+            homeBtn.Text = "Home";
+            homeBtn.X = lookupLab.X;
+            homeBtn.Y = addBtn.Y + 2;
 
-            Add(HomeBtn);
+            Add(homeBtn);
         }
     }
 }
@@ -1252,7 +1273,7 @@ namespace Views
 
                 if (theseSettings.changeAcronyms)
                 {
-                    ReaplceAcronyms();
+                    ReplaceAcronyms();
 
                     MessageBox.Query("Acronyms replaced", "All acronyms have been replaced", "Ok");
 
@@ -1260,12 +1281,12 @@ namespace Views
                 }
             };
 
-            HomeBtn.Clicked += () =>
+            homeBtn.Clicked += () =>
             {
                 GoHome();
             };
 
-            HomeBtn2.Clicked += () =>
+            homeBtn2.Clicked += () =>
             {
                 GoHome();
             };
@@ -1488,11 +1509,11 @@ namespace Views
             message2.X = message1.X;
             message2.Y = message1.Y + 1;
 
-            HomeBtn.Text = "Home";
-            HomeBtn.X = message1.X;
-            HomeBtn.Y = message2.Y + 2;
+            homeBtn.Text = "Home";
+            homeBtn.X = message1.X;
+            homeBtn.Y = message2.Y + 2;
 
-            Add(message1, message2, HomeBtn);
+            Add(message1, message2, homeBtn);
         }
 
         protected void DisplayWords()
@@ -1549,7 +1570,7 @@ namespace Views
             }
         }
 
-        protected void ReaplceAcronyms()
+        protected void ReplaceAcronyms()
         {
             string path = "Resources/Acronyms.txt";
             string[] acronyms = File.ReadAllLines(path);
@@ -1749,6 +1770,7 @@ namespace Views
 
         public void BuildAll()
         {
+        
             InitializeComponent();
 
             spellBtn.Clicked += () =>
@@ -2039,7 +2061,7 @@ namespace Views
 
         protected void RemoveThis(string word)
         {
-            string path = "/Users/lewisdrake/NEA/FINAL/Resources/AddedWords.txt";
+            string path = "Resources/AddedWords.txt";
             string[] words = File.ReadAllLines(path);
 
             if (words.Contains(word))
@@ -2130,13 +2152,32 @@ namespace Views
             {
                 SaveSettings();
             };
+
             viewDictBtn.Clicked += () =>
             {
                 Application.Run(new Dictionary());
             };
+
             resetBtn.Clicked += () =>
             {
                 ResetSettings();
+            };
+
+            acronymBtn.Clicked += () =>
+            {
+                if (shortAcrTxt.Text.ToString().Length != 0 && fullAcrTxt.Text.ToString().Length != 0)
+                {
+                    string shortAcr = shortAcrTxt.Text.ToString();
+                    string fullAcr = fullAcrTxt.Text.ToString();
+
+                    AddAcronym(shortAcr, fullAcr);
+
+                    MessageBox.Query("Acronym added", shortAcr + " added as " + fullAcr, "Ok");
+                }
+                else
+                {
+                    MessageBox.ErrorQuery("Error", "Enter text in both short and full acronym fields", "Ok");
+                }
             };
         }
 
@@ -2205,6 +2246,14 @@ namespace Views
 
             FetchSettings();
             MessageBox.Query("Reset", "Settings reset to default successfully", "Ok");
+        }
+
+        protected void AddAcronym(string shortAcr, string fullAcr)
+        {
+            string path = "Resources/Acronyms.txt";
+            string text = shortAcr + "*" + fullAcr + "\n";
+
+            File.AppendAllText(path, text);
         }
 
         protected Color GetColour(string colourStr)
