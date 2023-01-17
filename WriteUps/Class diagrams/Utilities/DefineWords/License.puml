@@ -1,0 +1,9 @@
+@startuml License
+
+class License
+{
+    + name : string
+    + url : string
+}
+
+@enduml

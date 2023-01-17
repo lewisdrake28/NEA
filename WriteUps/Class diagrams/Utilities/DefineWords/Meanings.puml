@@ -1,0 +1,11 @@
+@startuml Meanings 
+
+class Meanings
+{
+    + partOfSpeech : string 
+    + definitions : List<Definitions>
+    + synonyms : List<string>
+    + antonyms : List<string>
+}
+
+@enduml

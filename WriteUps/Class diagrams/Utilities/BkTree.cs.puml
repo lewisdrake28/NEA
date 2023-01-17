@@ -1,0 +1,22 @@
+@startuml Utilities
+
+class BkTree
+{
+    {static} # leven : LevenshteinDistance
+    {static} + tree : Dictionary<string, List<<Connection>>
+    {static} # words : string[]
+    {static} # weights : int[]
+    # root : string
+    # visitedWords : List<string>
+
+    + BkTree(rootin : string)
+    # CreateRoot(word : string) : void
+    + AddNode(words : string[], weights : int[], index : int) : void
+    # CreateNode(word : string, parent : string, weight : int) : void
+    # CheckEdges(word : string, weight : int) : string
+    + ClearTree() : void
+    + ReturnClosest(maxWeight : int) : string[]
+    # FindParent(int maxWeight) : string
+}
+
+@enduml

@@ -25,7 +25,7 @@ namespace Views
             textEntry.X = 1;
             textEntry.Y = 2;
             textEntry.Width = 76;
-            textEntry.Height = 5;
+            textEntry.Height = 15;
             textEntry.WordWrap = true;
 
             Add(textEntry);

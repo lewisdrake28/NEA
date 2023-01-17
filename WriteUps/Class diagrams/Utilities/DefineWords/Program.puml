@@ -1,0 +1,9 @@
+@startuml Program
+
+class Program
+{
+    {static} + DefineWord(toDefine : string) : List<string>
+    {static} Main(args : string[]) : void
+}
+
+@enduml

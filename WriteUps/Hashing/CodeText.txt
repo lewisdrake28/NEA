@@ -1,0 +1,16 @@
+Function CRC32
+   Input:
+      data:  Bytes     // Array of bytes
+   Output:
+      crc32: UInt32    // 32-bit unsigned CRC-32 value
+
+// Initialize CRC-32 to starting value
+crc32 ← 0xFFFFFFFF
+
+for each byte in data do
+   nLookupIndex ← (crc32 xor byte) and 0xFF
+   crc32 ← (crc32 shr 8) xor CRCTable[nLookupIndex]  // CRCTable is an array of 256 32-bit constants
+
+// Finalize the CRC-32 value by inverting all the bits
+crc32 ← crc32 xor 0xFFFFFFFF
+return crc32

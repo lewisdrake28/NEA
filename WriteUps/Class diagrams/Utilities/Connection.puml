@@ -1,0 +1,9 @@
+@startuml Connection
+
+struct Connection
+{
+    + word : string
+    + weight : int
+}
+
+@enduml

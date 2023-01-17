@@ -1,0 +1,24 @@
+@startuml SpellCheck
+
+class SpellCheck
+{
+    # firstIndex : int
+    # error : string
+    # falseWords : List<string>
+    # words : List<string>
+    # ignoredWords : List<string>
+    # theseSettings : Settings
+    + SpellCheck(textIn : string)
+    # CheckSpelling() : void
+    # CheckGrammar() : void
+    # LeaveMessage() : void
+    # DisplayWords() : void
+    # ReplaceAcronyms() : void
+    # ReplaceUserWord(newWord : string) : void
+    # ResizeText() : void
+    # GoHome() : void
+    # FixGrammar(text : string) : string
+
+}
+
+@enduml

@@ -1,0 +1,11 @@
+@startuml MainView
+
+class MainView
+{
+    # length : int 
+    + MainView()
+    + MainView(text : string)
+    + BuildAll() : void
+}
+
+@enduml

@@ -15,6 +15,7 @@ namespace Views
         protected Button viewDictBtn = new Button();
         protected Button saveBtn = new Button();
         protected Button resetBtn = new Button();
+        protected Button acronymBtn = new Button();
 
         protected CheckBox spellCheckCbx = new CheckBox();
         protected CheckBox changeAcronymsCbx = new CheckBox();
@@ -28,8 +29,12 @@ namespace Views
         protected Label maxLengthLab = new Label();
         protected Label changeAcryonymsLab = new Label();
         protected Label grammarCheckLab = new Label();
+        protected Label shortAcrLab = new Label();
+        protected Label fullAcrLab = new Label();
 
         protected TextField maxLengthTxt = new TextField();
+        protected TextField shortAcrTxt = new TextField();
+        protected TextField fullAcrTxt = new TextField();
 
         protected void InitializeComponent()
         {
@@ -107,6 +112,29 @@ namespace Views
             foregroundPick.SelectedColor = foreground;
 
             Add(backgroundPick, foregroundPick);
+
+            // build acronym elements
+            shortAcrTxt.X = foregroundPick.X;
+            shortAcrTxt.Y = grammarCheckLab.Y;
+            shortAcrTxt.Width = 8;
+
+            shortAcrLab.X = shortAcrTxt.X + 9;
+            shortAcrLab.Y = shortAcrTxt.Y;
+            shortAcrLab.Text = "Short acronym";
+
+            fullAcrTxt.X = shortAcrTxt.X;
+            fullAcrTxt.Y = shortAcrTxt.Y + 2;
+            fullAcrTxt.Width = 8;
+
+            fullAcrLab.X = shortAcrLab.X;
+            fullAcrLab.Y = fullAcrTxt.Y;
+            fullAcrLab.Text = "Full acronym";
+
+            acronymBtn.X = shortAcrTxt.X;
+            acronymBtn.Y = fullAcrTxt.Y + 2;
+            acronymBtn.Text = "Add acronym";
+
+            Add(shortAcrTxt, shortAcrLab, fullAcrTxt, fullAcrLab, acronymBtn);
         }
     }
 }

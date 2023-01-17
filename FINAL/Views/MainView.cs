@@ -30,6 +30,7 @@ namespace Views
 
         public void BuildAll()
         {
+        
             InitializeComponent();
 
             spellBtn.Clicked += () =>

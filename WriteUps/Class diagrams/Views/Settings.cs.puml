@@ -1,0 +1,18 @@
+@startuml Settings
+
+class Settings
+{
+    + spellCheck : bool
+    + changeAcronyms : bool
+    + grammarCheck : bool
+    + maxLength : int
+    + background : Color
+    + foregroud : Color
+    + Settings()
+    # SaveSettings() : void
+    + FetchSettings() : void
+    # ResetSettings() : void
+    # GetColor(colourStr : string) : Color
+}
+
+@enduml

@@ -1,0 +1,8 @@
+@startuml MasterView
+
+class MasterView
+{
+    + MasterView()
+}
+
+@enduml

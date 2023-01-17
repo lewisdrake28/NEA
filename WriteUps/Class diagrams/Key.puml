@@ -1,0 +1,16 @@
+@startuml Key
+
+annotation key
+{
+    - private attribute
+    + public attribute
+    # protected attribute
+    {static} static attribute
+
+    - private method()
+    + public method()
+    # protected method()
+    {static} static method()
+}
+
+@enduml

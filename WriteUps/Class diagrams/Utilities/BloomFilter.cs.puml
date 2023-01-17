@@ -1,0 +1,27 @@
+@startuml BloomFilter
+
+class BloomFilter
+{
+    # filter : int[] 
+    + BloomFilter(num : int)
+    + SetUp() : void 
+    # WriteFilter() : void
+    + BloomFilter()
+    + Lookup(word : string) : bool
+    + BinarySearch(target : string) : bool
+    # Insert(word : string) : void
+    # Hash1(word : string) : uint
+    # Hash2(word : string) : uint
+    # Hash3(word : string) : uint
+    # Hash4(word : string) : uint
+    # Hash5(word : string) : uint
+    # Hash6(word : string) : uint
+    # Hash7(word : string) : uint
+    # Hash8(word : string) : uint
+    # Hash9(word : string) : uint
+    # Hash10(word : string) : uint
+    # CircularShift(a : uint) : uint
+    # Mix(a : uint) : uint
+}
+
+@enduml

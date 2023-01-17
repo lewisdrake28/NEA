@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 namespace Utilities
 {
     
+    
     ////////////
     // BKTree //
     ////////////
@@ -197,7 +198,7 @@ namespace Utilities
 
     class BloomFilter
     {
-        protected int[] filter = new int[5365948];
+        protected int[] filter = new int[2682975];
 
         // FIRST TIME USE
         // 

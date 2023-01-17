@@ -1,0 +1,18 @@
+@startuml DictionaryDesigner
+
+class Dictionary
+{
+    # lookupBtn : Button
+    # nextBtn : Button
+    # prevBtn : Button
+    # defineBtn : Button
+    # addBtn : Button
+    # removeBtn : Button
+    # filterBtn : Button
+    # wordLabs : Label[]
+    # filterRad : RadioGroup
+    # lookupTxt : TextField
+    # InitializeComponent() : void
+}
+
+@enduml

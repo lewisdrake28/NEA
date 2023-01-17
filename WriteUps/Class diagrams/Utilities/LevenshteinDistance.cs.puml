@@ -1,0 +1,11 @@
+@startuml LevenshteinDistance
+
+class LevenshteinDistance
+{
+    # distance : int
+    + LevenshteinDistance()
+    + Calculate(a : string, b : string) : int
+    + CalculateAll(a : string, words : string[]) : int[]
+}
+
+@enduml

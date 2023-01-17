@@ -1,0 +1,22 @@
+@startuml SettingsDesigner
+
+class Settings
+{
+    # viewDictBtn : Button
+    # saveBtn : Button
+    # resetBrn : Button
+    # spellCheckCbx : CheckBox
+    # changeAcronymsCbx : CheckBox
+    # grammarCheckCbx : CheckBox
+    # backgroundPick : ColorPicker
+    # foregroundPick : ColorPicker
+    # spellCheckLab : Label
+    # viewDictLab : Label
+    # maxLengthLab : Label
+    # changeAcronymsLab : Label
+    # grammarCheckLab : Label
+    # maxLengthTxt : TextField
+    # InitializeComponent() : void
+}
+
+@enduml

@@ -31,13 +31,32 @@ namespace Views
             {
                 SaveSettings();
             };
+
             viewDictBtn.Clicked += () =>
             {
                 Application.Run(new Dictionary());
             };
+
             resetBtn.Clicked += () =>
             {
                 ResetSettings();
+            };
+
+            acronymBtn.Clicked += () =>
+            {
+                if (shortAcrTxt.Text.ToString().Length != 0 && fullAcrTxt.Text.ToString().Length != 0)
+                {
+                    string shortAcr = shortAcrTxt.Text.ToString();
+                    string fullAcr = fullAcrTxt.Text.ToString();
+
+                    AddAcronym(shortAcr, fullAcr);
+
+                    MessageBox.Query("Acronym added", shortAcr + " added as " + fullAcr, "Ok");
+                }
+                else
+                {
+                    MessageBox.ErrorQuery("Error", "Enter text in both short and full acronym fields", "Ok");
+                }
             };
         }
 
@@ -106,6 +125,14 @@ namespace Views
 
             FetchSettings();
             MessageBox.Query("Reset", "Settings reset to default successfully", "Ok");
+        }
+
+        protected void AddAcronym(string shortAcr, string fullAcr)
+        {
+            string path = "Resources/Acronyms.txt";
+            string text = shortAcr + "*" + fullAcr + "\n";
+
+            File.AppendAllText(path, text);
         }
 
         protected Color GetColour(string colourStr)

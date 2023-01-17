@@ -1,6 +1,6 @@
-/////////////////////////////////////////////
-// View designers/SkeletonView.Designer.cs //
-/////////////////////////////////////////////
+///////////////////////////////////////////
+// View designers/SpellCheck.Designer.cs //
+///////////////////////////////////////////
 
 // install dependencies
 using Terminal.Gui;
@@ -15,8 +15,8 @@ namespace Views
         protected Button ignoreBtn = new Button();
         protected Button userBtn = new Button();
         protected Button acronymBtn = new Button();
-        protected Button HomeBtn = new Button();
-        protected Button HomeBtn2 = new Button();
+        protected Button homeBtn = new Button();
+        protected Button homeBtn2 = new Button();
         protected Button replaceBtn = new Button();
         protected Button addBtn = new Button();
         protected Button resizeBtn = new Button();
@@ -99,11 +99,11 @@ namespace Views
             Add(addBtn);
 
             // 
-            HomeBtn.Text = "Home";
-            HomeBtn.X = lookupLab.X;
-            HomeBtn.Y = addBtn.Y + 2;
+            homeBtn.Text = "Home";
+            homeBtn.X = lookupLab.X;
+            homeBtn.Y = addBtn.Y + 2;
 
-            Add(HomeBtn);
+            Add(homeBtn);
         }
     }
 }

@@ -1,0 +1,13 @@
+@startuml Word
+
+Class Word
+{
+    + word : string
+    + phonetic : string
+    + phonetics : List<Phonetics>
+    + meanings : List<Meanings>
+    + license : License
+    + sourceUrls : List<string>
+}
+
+@enduml

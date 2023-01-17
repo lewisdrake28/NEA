@@ -1,0 +1,8 @@
+algorithm fnv-1a is
+    hash := FNV_offset_basis
+
+    for each byte_of_data to be hashed do
+        hash := hash XOR byte_of_data
+        hash := hash × FNV_prime
+
+    return hash 

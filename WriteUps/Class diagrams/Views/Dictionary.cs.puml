@@ -1,0 +1,24 @@
+@startuml Dictionary
+
+class Dictionary
+{
+    + words : string[]
+    # currentLookup : string
+    # toDisplay : List<string>
+    # firstIndex : int
+    # currentIndex : int
+    + Dictionary()
+    # FetchAllWords() : string[]
+    # FetchWords(num : int) : string[]
+    # NextPage() : void
+    # PrevPage() : void
+    # Lookup(firstIndex : int)
+    # UpdateWords() : void
+    # DisplayLabels(toDisplay : List<string>) : void
+    # DefineThis(word : string) : void
+    # AddThis(word : string) : void
+    # RemoveThis(word : string) : void
+    # FilterList(choice : int) : void
+}
+
+@enduml

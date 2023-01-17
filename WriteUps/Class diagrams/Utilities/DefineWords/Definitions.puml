@@ -1,0 +1,11 @@
+@startuml Definitions 
+
+class Definitions 
+{
+    + defintion : string
+    + synonyms : List<string>
+    + antonyms : List<string>
+    + example : string
+}
+
+@enduml

@@ -1,0 +1,8 @@
+@startuml MasterViewDesigner
+
+class MasterView
+{
+    + Build() : void
+}
+
+@enduml

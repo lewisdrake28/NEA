@@ -1,0 +1,12 @@
+@startuml MainViewDesigner
+
+class MainView
+{
+    # spellBtn : Button
+    # clearBtn : Button
+    # lengthLab : Label
+    # textEntry : TextView
+    # InitializeComponent() : void
+}
+
+@enduml

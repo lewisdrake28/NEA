@@ -62,7 +62,7 @@ namespace Views
 
                 if (theseSettings.changeAcronyms)
                 {
-                    ReaplceAcronyms();
+                    ReplaceAcronyms();
 
                     MessageBox.Query("Acronyms replaced", "All acronyms have been replaced", "Ok");
 
@@ -70,12 +70,12 @@ namespace Views
                 }
             };
 
-            HomeBtn.Clicked += () =>
+            homeBtn.Clicked += () =>
             {
                 GoHome();
             };
 
-            HomeBtn2.Clicked += () =>
+            homeBtn2.Clicked += () =>
             {
                 GoHome();
             };
@@ -298,11 +298,11 @@ namespace Views
             message2.X = message1.X;
             message2.Y = message1.Y + 1;
 
-            HomeBtn.Text = "Home";
-            HomeBtn.X = message1.X;
-            HomeBtn.Y = message2.Y + 2;
+            homeBtn.Text = "Home";
+            homeBtn.X = message1.X;
+            homeBtn.Y = message2.Y + 2;
 
-            Add(message1, message2, HomeBtn);
+            Add(message1, message2, homeBtn);
         }
 
         protected void DisplayWords()
@@ -359,7 +359,7 @@ namespace Views
             }
         }
 
-        protected void ReaplceAcronyms()
+        protected void ReplaceAcronyms()
         {
             string path = "Resources/Acronyms.txt";
             string[] acronyms = File.ReadAllLines(path);

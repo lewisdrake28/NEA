@@ -1,0 +1,11 @@
+@startuml Phonetics
+
+class Phonetics
+{
+    + text : string
+    + audio : string
+    + sourceUrl : string
+    + license : License
+}
+
+@enduml

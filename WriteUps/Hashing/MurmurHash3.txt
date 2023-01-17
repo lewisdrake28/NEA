@@ -1,0 +1,223 @@
+algorithm Murmur3_32 is
+    // Note: In this version, all arithmetic is performed with unsigned 32-bit integers.
+    //       In the case of overflow, the result is reduced modulo 232.
+    input: key, len, seed
+
+    c1 ← 0xcc9e2d51
+    c2 ← 0x1b873593
+    r1 ← 15
+    r2 ← 13
+    m ← 5
+    n ← 0xe6546b64
+
+    hash ← seed
+
+    for each fourByteChunk of key do
+        k ← fourByteChunk
+
+        k ← k × c1
+        k ← k ROL r1
+        k ← k × c2
+
+        hash ← hash XOR k
+        hash ← hash ROL r2
+        hash ← (hash × m) + n
+
+    with any remainingBytesInKey do
+        remainingBytes ← SwapToLittleEndian(remainingBytesInKey)
+        // Note: Endian swapping is only necessary on big-endian machines.
+        //       The purpose is to place the meaningful digits towards the low end of the value,
+        //       so that these digits have the greatest potential to affect the low range digits
+        //       in the subsequent multiplication.  Consider that locating the meaningful digits
+        //       in the high range would produce a greater effect upon the high digits of the
+        //       multiplication, and notably, that such high digits are likely to be discarded
+        //       by the modulo arithmetic under overflow.  We don't want that.
+
+        remainingBytes ← remainingBytes × c1
+        remainingBytes ← remainingBytes ROL r1
+        remainingBytes ← remainingBytes × c2
+
+        hash ← hash XOR remainingBytes
+
+    hash ← hash XOR len
+
+    hash ← hash XOR (hash >> 16)
+    hash ← hash × 0x85ebca6b
+    hash ← hash XOR (hash >> 13)
+    hash ← hash × 0xc2b2ae35
+    hash ← hash XOR (hash >> 16)
+
+-------------------------------------------------
+
+public static class MurMurHash3
+{
+	//Change to suit your needs
+	const uint seed = 144;
+
+	public static int Hash(Stream stream)
+	{
+		const uint c1 = 0xcc9e2d51;
+		const uint c2 = 0x1b873593;
+
+		uint h1 = seed;
+		uint k1 = 0;
+		uint streamLength = 0;
+
+		using (BinaryReader reader = new BinaryReader(stream))
+		{
+			byte[] chunk = reader.ReadBytes(4);
+			while (chunk.Length > 0)
+			{
+				streamLength += (uint)chunk.Length;
+				switch(chunk.Length)
+				{
+					case 4:
+						/* Get four bytes from the input into an uint */
+						k1 = (uint)
+						   (chunk[0]
+						  | chunk[1] << 8
+						  | chunk[2] << 16
+						  | chunk[3] << 24);
+
+						/* bitmagic hash */
+						k1 *= c1;
+						k1 = rotl32(k1, 15);
+						k1 *= c2;
+GOT UP TO HERE
+						h1 ^= k1;
+						h1 = rotl32(h1, 13);
+						h1 = h1 * 5 + 0xe6546b64;
+						break;
+					case 3:
+						k1 = (uint)
+						   (chunk[0]
+						  | chunk[1] << 8
+						  | chunk[2] << 16);
+						k1 *= c1;
+						k1 = rotl32(k1, 15);
+						k1 *= c2;
+						h1 ^= k1;
+						break;
+					case 2:
+						k1 = (uint)
+						   (chunk[0]
+						  | chunk[1] << 8);
+						k1 *= c1;
+						k1 = rotl32(k1, 15);
+						k1 *= c2;
+						h1 ^= k1;
+						break;
+					case 1:
+						k1 = (uint)(chunk[0]);
+						k1 *= c1;
+						k1 = rotl32(k1, 15);
+						k1 *= c2;
+						h1 ^= k1;
+						break;
+					
+				}
+				chunk = reader.ReadBytes(4);
+			}
+		}
+				
+		// finalization, magic chants to wrap it all up
+		h1 ^= streamLength;
+		h1 = fmix(h1);
+
+		unchecked //ignore overflow
+		{
+			return (int)h1;
+		}
+	}
+	
+	private static uint rotl32(uint x, byte r)
+	{
+		return (x << r) | (x >> (32 - r));
+	}
+
+	private static uint fmix(uint h)
+	{
+		h ^= h >> 16;
+		h *= 0x85ebca6b;
+		h ^= h >> 13;
+		h *= 0xc2b2ae35;
+		h ^= h >> 16;
+		return h;
+	}
+}
+
+void Main()
+{
+	Encoding encoding = new UTF8Encoding();
+	byte[] input = encoding.GetBytes("The quick brown fox jumps over the lazy dog");
+	using (MemoryStream stream = new MemoryStream(input))
+	{
+		int hash = MurMurHash3.Hash(stream);
+		new {Hash=hash, Bytes = BitConverter.GetBytes(hash) }.Dump("Result");
+	}
+}
+
+-------------------------------------------------
+
+/**
+ * Takes a string and returns an array of substrings that are smaller than maxBytes.  
+ *
+ * This is an overly commented version of the non-generator version of the accepted answer, 
+ * in case it helps anyone understand its (brilliant) logic.  
+ *
+ * Both plain js and node variations are shown below - simply un/comment out your preference  
+ * 
+ * @param  {string} s - the string to be chunked  
+ * @param  {maxBytes} maxBytes - the maximum size of a chunk, in bytes   
+ * @return {arrray} - an array of strings less than maxBytes (except in extreme edge cases)    
+ */
+function chunk(s, maxBytes) {
+  // for plain js  
+  const decoder = new TextDecoder("utf-8");
+  let buf = new TextEncoder("utf-8").encode(s);
+  // for node
+  // let buf = Buffer.from(s);
+  const result = [];
+  var counter = 0;
+  while (buf.length) {
+    console.log("=============== BEG LOOP " + counter + " ===============");
+    console.log("result is now:");
+    console.log(result);
+    console.log("buf is now:");
+    // for plain js
+    console.log(decoder.decode(buf));
+    // for node  
+    // console.log(buf.toString());
+    /* get index of the last space character in the first chunk, 
+    searching backwards from the maxBytes + 1 index */
+    let i = buf.lastIndexOf(32, maxBytes + 1);
+    console.log("i is: " + i);
+    /* if no space is found in the first chunk,
+    get index of the first space character in the whole string,
+    searching forwards from 0 - in edge cases where characters
+    between spaces exceeds maxBytes, eg chunk("123456789x 1", 9),
+    the chunk will exceed maxBytes */
+    if (i < 0) i = buf.indexOf(32, maxBytes);
+    console.log("at first condition, i is: " + i);
+    /* if there's no space at all, take the whole string,
+    again an edge case like chunk("123456789x", 9) will exceed maxBytes*/
+    if (i < 0) i = buf.length;
+    console.log("at second condition, i is: " + i);
+    // this is a safe cut-off point; never half-way a multi-byte
+    // because the index is always the index of a space    
+    console.log("pushing buf.slice from 0 to " + i + " into result array");
+    // for plain js
+    result.push(decoder.decode(buf.slice(0, i)));
+    // for node
+    // result.push(buf.slice(0, i).toString());
+    console.log("buf.slicing with value: " + (i + 1));
+    // slice the string from the index + 1 forwards  
+    // it won't erroneously slice out a value after i, because i is a space  
+    buf = buf.slice(i + 1); // skip space (if any)
+    console.log("=============== END LOOP " + counter + " ===============");
+    counter++;
+  }
+  return result;
+}
+
+console.log(chunk("Hey there! € 100 to pay", 12));

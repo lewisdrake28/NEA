@@ -1,0 +1,23 @@
+@startuml SpellCheck
+
+class SpellCheck
+{
+    # ignoreBtn : Button
+    # userBtn : Button
+    # acronymBtn : Button
+    # homeBtn : Button
+    # homeBtn2 : Button
+    # replaceBtn : Button
+    # addBtn : Button
+    # resizeBtn : Button
+    # lookupLab : Label
+    # lookupLab2 : Label
+    # lookupLab3 : Label
+    # userLab : Label
+    # wordLabs : List<Label>
+    # lookupTxt : TextField
+    # userTxt : TextField
+    # InitializeComponent() : void
+}
+
+@enduml
