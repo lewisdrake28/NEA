@@ -1,5 +1,5 @@
 Spell True
-Lengt 0
+Lengt -1
 Acron True
 Grama False
 Foreg Gray
