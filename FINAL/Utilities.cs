@@ -569,7 +569,7 @@ namespace Utilities
             // row and column sizes are (word.Length + 1) because row/column 1 store index values
             int[,] matrix = new int[a.Length + 1, b.Length + 1];
 
-            // store index values in row/coilumn 1, example
+            // store index values in row/column 1, example
             // 0 1 ...
             // 1
             // 2
